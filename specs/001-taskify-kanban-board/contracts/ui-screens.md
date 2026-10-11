@@ -170,7 +170,9 @@ scope (US5).
 - **Actions**:
   - Edit title or description inline → `PATCH /tasks/:taskId` (FR-011)
   - Change assignee, including "Unassigned" → `PATCH /tasks/:taskId` with `assignee_id` (FR-012)
-  - Change Status → `POST /tasks/:taskId/move` without `position` (keyboard path for FR-013)
+  - Change Status → `POST /tasks/:taskId/move` without `position` (keyboard path for FR-013). In the
+    UI, "Status" is the label for the task's **column**; the four statuses are exactly the four
+    board columns
   - Add comment → `POST /tasks/:taskId/comments` (FR-017)
   - Edit / Delete on own comments only → see `comment-edit` (FR-019)
   - Close (icon, Escape, click on dimmed board) → back to `/projects/:projectId`

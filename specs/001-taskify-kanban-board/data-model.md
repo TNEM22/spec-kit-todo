@@ -114,8 +114,8 @@ exposed through the API or UI. Kept for the whole phase (no automatic deletion).
 | action | enum: `project.created`, `task.created`, `task.updated`, `task.assigned`, `task.moved`, `comment.created`, `comment.updated`, `comment.deleted`, `request.refused` | |
 | entity_type | enum `project` \| `task` \| `comment`, nullable | Null for `request.refused` |
 | entity_id | integer, nullable | Id of the changed entity (kept after comment deletion); null for `request.refused` |
-| reason | enum `user_required` \| `not_comment_author` \| `validation_error`, nullable | Set only for `request.refused` |
-| route | string(120), nullable | Method and route template for `request.refused`, e.g. `PATCH /comments/{comment_id}`; never the raw URL or body |
+| reason | enum `user_required` \| `not_comment_author` \| `validation_error` \| `origin_not_allowed`, nullable | Set only for `request.refused`; `origin_not_allowed` is used for WebSocket handshakes closed with 4403 |
+| route | string(120), nullable | Method and route template for `request.refused`, e.g. `PATCH /comments/{comment_id}` or `WS /ws`; never the raw URL or body |
 | changes | JSON text, nullable | Changed fields as `{field: [old, new]}`; for `comment.deleted` the removed body. Always null for `request.refused` (submitted text is never stored) |
 | request_id | string(64), nullable | Correlates with logs (research R12) |
 

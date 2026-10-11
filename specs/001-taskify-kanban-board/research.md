@@ -3,7 +3,7 @@
 **Feature**: [spec.md](spec.md) | **Plan**: [plan.md](plan.md) | **Date**: 2026-10-11
 
 Each entry records a decision, why it was chosen, and what else was considered. R14 was added after
-the requirements review and is placed before R13 because it refines R8, R6 and R7. The stack itself
+the requirements review and refines R6, R7 and R8. The stack itself
 (FastAPI, SQLAlchemy async + SQLite, Alembic, Angular 21, CDK DragDrop, WebSocket) was given by the
 user; the entries below resolve how to use it and the gaps the input left open.
 
@@ -205,6 +205,19 @@ user; the entries below resolve how to use it and the gaps the input left open.
 - **Alternatives considered**: Prometheus client (rejected for now: extra dependency with no
   scraper in a local setup; the JSON endpoint can be swapped later).
 
+## R13. Local security posture (constitution Security Requirements)
+
+- **Decision**: Uvicorn binds to `127.0.0.1` only, enforced by the `python -m app` entry point
+  (`backend/app/__main__.py`), which hard-codes the host and offers no option to change it. CORS allows only the Angular dev server origin
+  from settings (`http://localhost:4200`). Responses include `X-Content-Type-Options: nosniff`,
+  `Referrer-Policy: no-referrer`, `X-Frame-Options: DENY`, and a restrictive CSP on API responses.
+  No secrets are needed in this phase; settings come from `.env` via pydantic-settings and `.env` is
+  git-ignored with a committed `.env.example`. Dependencies are pinned (`requirements.txt` with
+  hashes or a lock file, `package-lock.json`) and scanned with `pip-audit` and `npm audit`.
+- **Not in this phase (justified in plan.md)**: authentication, TLS, rate limiting. All three
+  depend on exposing Taskify beyond the local machine, which the spec forbids until authentication
+  exists.
+
 ## R14. Requirements-review follow-ups (spec clarifications of 2026-10-11, review CHK001–CHK040)
 
 ### Character counting and trimming (FR-020)
@@ -275,15 +288,3 @@ user; the entries below resolve how to use it and the gaps the input left open.
   auto-dismiss after 6 s.
 - **Timing measurement (SC-003, SC-007, SC-009)**: Performance tests run on one machine with five
   connected clients and a seeded 200-task board, matching the spec's stated conditions.
-
-## R13. Local security posture (constitution Security Requirements)
-
-- **Decision**: Uvicorn binds to `127.0.0.1` only. CORS allows only the Angular dev server origin
-  from settings (`http://localhost:4200`). Responses include `X-Content-Type-Options: nosniff`,
-  `Referrer-Policy: no-referrer`, `X-Frame-Options: DENY`, and a restrictive CSP on API responses.
-  No secrets are needed in this phase; settings come from `.env` via pydantic-settings and `.env` is
-  git-ignored with a committed `.env.example`. Dependencies are pinned (`requirements.txt` with
-  hashes or a lock file, `package-lock.json`) and scanned with `pip-audit` and `npm audit`.
-- **Not in this phase (justified in plan.md)**: authentication, TLS, rate limiting. All three
-  depend on exposing Taskify beyond the local machine, which the spec forbids until authentication
-  exists.

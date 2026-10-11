@@ -56,7 +56,7 @@ Constitution v2.1.0 ([.specify/memory/constitution.md](../../.specify/memory/con
 
 | Principle / Rule | Status | How the plan complies |
 |------------------|--------|-----------------------|
-| I. Security-First: security section in spec | ✅ Pass | Spec has Security Considerations; this plan adds research R2, R6, R8, R13 |
+| I. Security-First: security section in spec and plan | ✅ Pass | Spec has Security Considerations; this plan has its own [Security Considerations](#security-considerations) section (authentication, authorization, data exposure, abuse cases) |
 | I. Least privilege | ✅ Pass | No privileged accounts or secrets; DB file is local; WebSocket is read-only for clients |
 | I. Deny by default | ✅ Pass | `require_user` dependency on every route except `GET /users` and `GET /health`, `/metrics` (declared public) |
 | I. No secrets in code/logs | ✅ Pass | Settings via `.env` (git-ignored) + `.env.example`; logs exclude bodies and comment text |
@@ -70,7 +70,7 @@ Constitution v2.1.0 ([.specify/memory/constitution.md](../../.specify/memory/con
 | III. Versioned external API; ORM-only data access | ✅ Pass | REST under `/api/v1`; SQLAlchemy ORM only, no raw SQL (research R3) |
 | III. Domains testable on their own | ✅ Pass | `backend/tests/unit/` per service; integration tests per user story |
 | I/II. Notification privacy and input | ✅ Pass | Every notification query filters by the selected user; others' ids return 404; notification text rendered as plain text (research R7) |
-| IV. Public code documented | ✅ Pass | Docstrings on public functions, routers and schemas; TSDoc on exported Angular APIs; enforced in review |
+| IV. Public code documented | ✅ Pass | Docstrings on public modules, functions, routers and schemas enforced by ruff pydocstyle rules (`D100`–`D103`); TSDoc on exported Angular APIs enforced by `eslint-plugin-jsdoc`; both run in the check script and CI |
 | IV. App READMEs, domain docstrings, machine-readable contract | ✅ Pass | `backend/README.md`, `frontend/README.md`, a module docstring per domain; OpenAPI plus [contracts/websocket.md](contracts/websocket.md) event schema, with OpenAPI drift test |
 | IV. Decision records | ✅ Pass | `research.md` here, copied to `docs/adr/` during implementation for lasting decisions |
 | V. Structured logs with correlation id | ✅ Pass | JSON logs, `X-Request-ID` middleware, request id carried into WebSocket events (research R12) |
@@ -82,10 +82,11 @@ Constitution v2.1.0 ([.specify/memory/constitution.md](../../.specify/memory/con
 | Security Req.: rate limiting public endpoints | ⚠️ Deviation | Not exposed publicly; see Complexity Tracking |
 | Security Req.: hashed passwords | N/A | No passwords stored |
 | Security Req.: no stack traces in errors | ✅ Pass | Global exception handler |
-| Workflow: CI gates, contract tests on backend contract and generated client | ✅ Pass | pytest, `ng test`, `ng lint`, OpenAPI drift test, generated-client compile check, audits (quickstart §3) |
+| Workflow: CI gates, contract tests on backend contract and generated client | ⚠️ Deviation (partial) | `.github/workflows/ci.yml` runs every gate (pytest, `ng test`, `ng lint`, ruff, OpenAPI drift, client build, `pip-audit`, `npm audit`) once a remote exists; the repository has no remote yet, so `scripts/check.ps1` must pass locally before every merge until then; see Complexity Tracking |
 | Workflow: review checks domain boundaries | ✅ Pass | Import rule: `services/<domain>.py` may import only its own `models/<domain>.py` (enforced by a unit test that scans imports) |
 
-**Gate result (pre-research)**: PASS with justified deviations listed in Complexity Tracking.
+**Gate result (pre-research)**: PASS with justified deviations listed in Complexity Tracking
+(no login, no TLS, no rate limiting, CI not yet running).
 
 **Gate result (post-design re-check)**: PASS. The data model, contracts and UI plan introduce no new
 deviations. Items tightened during design: the WebSocket handshake checks `Origin` and the user id,
@@ -107,6 +108,41 @@ minimum width (research R14).
 **Plan revision 2026-10-11 (3)**: aligned with the spec clarification that closes review CHK040
 (settings page, list view, card comment counts and footer links are out of scope). Contracts and
 the Out of Scope list updated; no change to architecture, data model, gates or task scope.
+
+**Plan revision 2026-10-11 (4)**: fixes from `/speckit-analyze`: added the plan's own Security
+Considerations section (K1); added a CI workflow plus a local-gate exception while no remote exists
+(K2); documentation enforced by linters (K3); `origin_not_allowed` audit reason (I1); a run entry
+point that always binds to 127.0.0.1 (U1); browser-side timing for SC-007 (G1); a usability
+walkthrough for SC-001/SC-002/SC-008 (G2); concrete seed data (A1); FR-004 check (G3); "Status"
+means column (T1); research note order (D1).
+
+## Security Considerations
+
+Required by Constitution Principle I for every plan. Details live in the research notes cited.
+
+- **Authentication**: none in this phase, by spec decision. The selected user travels in
+  `X-Taskify-User` (REST) and the `user` query parameter (WebSocket) and is an identity choice, not
+  proof of identity (research R2). Recorded as a deviation in Complexity Tracking.
+- **Authorization**: deny by default through `require_user` on every route except `GET /users`,
+  `GET /health` and `GET /metrics`; only a comment's author may edit or delete it (403); a
+  notification is visible and changeable only by its recipient (404 for others); the WebSocket
+  sends each notification only to its recipient's sockets (research R2, R6, R7).
+- **Data exposure**: only display names, roles and team work data are stored; error responses carry
+  no stack traces, database or file details, server names or internal ids (FR-024); logs exclude
+  request bodies and comment text; audit entries for refused requests never store submitted values
+  (research R8, R12, R14). The API listens on 127.0.0.1 only, enforced by the run entry point
+  `python -m app` (no host option) and checked by quickstart scenario 36 (research R13).
+- **Input handling**: Pydantic schemas with `extra="forbid"`, NFC normalisation, trimming and
+  grapheme-based limits; parameterised ORM queries only; Angular interpolation only, with
+  `innerHTML` and `bypassSecurityTrust*` banned by lint (research R8, R14).
+- **Abuse cases**: (1) impersonation by picking another user is possible by design; every change and
+  refused request is audited with the selected user. (2) Cross-site WebSocket hijacking is blocked
+  by the `Origin` check (close 4403, audited as `origin_not_allowed`). (3) Script injection through
+  titles, comments or notifications is blocked by plain-text rendering. (4) Probing other users'
+  notifications returns 404 without confirming existence. (5) Flooding is not rate-limited because
+  nothing is reachable off the machine; rate limiting arrives with authentication.
+- **Dependencies**: pinned versions; `pip-audit` and `npm audit --audit-level=high` in the check
+  script and CI.
 
 ## Project Structure
 
@@ -137,6 +173,8 @@ specs/001-taskify-kanban-board/
 ```text
 .nvmrc                             # "24" (constitution Technology Stack)
 .python-version                    # "3.12"
+.github/workflows/ci.yml           # all quality gates; runs once a remote exists (K2)
+scripts/check.ps1                  # same gates locally; required before every merge until CI runs
 
 backend/
 ├── README.md
@@ -149,6 +187,7 @@ backend/
 │   ├── env.py                     # async template, render_as_batch=True
 │   └── versions/
 ├── app/
+│   ├── __main__.py                # `python -m app`: runs Uvicorn on 127.0.0.1:8000, one worker, no host option
 │   ├── main.py                    # app factory, routers, middleware, lifespan (seed)
 │   ├── core/
 │   │   ├── config.py              # pydantic-settings Settings
@@ -225,6 +264,7 @@ frontend/
         ├── app.routes.ts
         ├── app.component.ts       # aurora background + router outlet + toast region
         ├── core/
+        │   ├── title.strategy.ts      # plain-text browser tab titles (FR-021)
         │   ├── api/
         │   │   ├── openapi.json   # exported from backend (committed)
         │   │   └── generated/     # ng-openapi-gen output (do not edit)
@@ -395,6 +435,7 @@ None. All 15 manifest rows are `generated`.
 | No authentication (Principle I; Security Req. central auth) | Spec phase 1 decision: predefined users, no login; identity choice only | Adding login contradicts the spec scope. Mitigated by deny-by-default `X-Taskify-User` check, audit log, localhost-only binding |
 | No TLS (Security Req.) | Server bound to 127.0.0.1 for local development only | Local certificates add setup cost with no attacker on the loopback interface; required before any network exposure |
 | No rate limiting (Security Req.) | No public endpoints; localhost only | A limiter protects nothing locally; must be added together with authentication before exposure |
+| CI not yet running (Workflow: "CI MUST pass before merge") | The repository has no remote, so no CI service can run `.github/workflows/ci.yml` | Dropping the gate entirely was rejected; instead `scripts/check.ps1` runs the identical gates and MUST pass locally before every merge. This row is removed as soon as a remote is added and the workflow runs |
 
 ## Out of Scope for This Plan
 

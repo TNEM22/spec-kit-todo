@@ -24,7 +24,7 @@ python -m venv .venv
 pip install -r requirements-dev.txt
 Copy-Item .env.example .env          # DATABASE_URL, CORS_ORIGINS, LOG_LEVEL
 alembic upgrade head                 # creates taskify.db with WAL enabled
-uvicorn app.main:app --host 127.0.0.1 --port 8000
+python -m app                        # Uvicorn on 127.0.0.1:8000, one worker; no host option on purpose
 ```
 
 Expected:
@@ -55,6 +55,8 @@ cd frontend; ng test --watch=false; ng lint
 # dependency scans
 cd backend; pip-audit -r requirements.txt
 cd frontend; npm audit --audit-level=high
+# or everything at once (required before every merge until CI runs on a remote):
+./scripts/check.ps1
 ```
 
 Expected: all tests pass, including the OpenAPI drift test (research R10).
@@ -102,7 +104,9 @@ fresh rather than duplicating a tab, which copies the selection.
 | 33 | Reduced motion | Turn on the OS "reduce motion" setting; drag a card and open the board while loading | No tilt or shimmer; everything else works | FR-025 |
 | 34 | Minimum width | Resize the window to 1024 px | All screens usable; the board scrolls horizontally if needed | FR-025 |
 | 35 | Timing conditions | Run `pytest -m perf` (5 WebSocket clients, seeded 200-task board) | Board load < 3 s; move < 1 s for the mover and < 2 s for others; notification < 2 s | SC-003, SC-007, SC-009 |
-| 36 | Local only | From another machine on the network, open `http://<dev-machine-ip>:8000/api/v1/health` | Connection refused | Spec Security Considerations |
+| 36 | Local only | Start with `python -m app`; from another machine on the network, open `http://<dev-machine-ip>:8000/api/v1/health` | Connection refused | Spec Security Considerations |
+| 37 | Usability walkthrough | With someone new to Taskify and a stopwatch: (a) from the start screen, pick a user, open a project and move a task; (b) create and assign a task; (c) on a project with at least 20 tasks (Customer Portal seed), each of the five users points out all of their own tasks | (a) under 1 minute without instructions; (b) under 30 seconds; (c) every user finds all their own tasks and no others within 10 seconds | SC-001, SC-002, SC-008 |
+| 38 | Browser board load | Open the seeded 200-task board (`pytest -m perf` seeds it; or `python -m app.seed --perf`) in the browser with DevTools Performance | First complete paint of all four columns under 3 s; a dropped card shows in its new position under 1 s | SC-007 |
 
 ## 5. Reset local data
 

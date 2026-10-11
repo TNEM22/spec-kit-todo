@@ -14,8 +14,8 @@ REST stays the only way to change data.
 
 | Check | Failure |
 |-------|---------|
-| `Origin` header is in the allowed CORS origins | Close `4403 origin_not_allowed` (logged and audited) |
-| `user` query parameter is an existing user id | Close `4401 user_required` (logged and audited) |
+| `Origin` header is in the allowed CORS origins | Close `4403 origin_not_allowed` (logged; audited with reason `origin_not_allowed`, route `WS /ws`) |
+| `user` query parameter is an existing user id | Close `4401 user_required` (logged; audited with reason `user_required`, route `WS /ws`) |
 
 On success the server sends `{"type": "hello", "data": {"user_id": <id>}}`. The server registers the
 socket under that user id for targeted delivery. When the user switches identity, the client closes
@@ -39,6 +39,7 @@ Clients send `ping` every 25 s; the server closes sockets silent for 60 s.
   "occurred_at": "2026-10-11T09:02:00Z",
   "actor_id": 2,
   "project_id": 1,
+  "request_id": "6f1c2b0e-...",
   "data": { }
 }
 ```
@@ -62,7 +63,7 @@ Clients send `ping` every 25 s; the server closes sockets silent for 60 s.
 | `notification.created` | `{ notification: NotificationOut, unread_count }` | A change creates a notification for this user (data-model "Creation rules") |
 | `notifications.read` | `{ ids: [int] \| "all", unread_count }` | The same user marks one or all as read in another tab |
 
-`project_id` in the envelope is set for board events and for `notification.created`; it is null for
+`request_id` is the `X-Request-ID` of the REST request that caused the event (Constitution V correlation id); it is null for server-initiated messages. `project_id` in the envelope is set for board events and for `notification.created`; it is null for
 `notifications.read`.
 
 Resource shapes are defined in [rest-api.md](rest-api.md). Clients apply events idempotently
