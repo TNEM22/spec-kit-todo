@@ -56,6 +56,37 @@
 - Q: Do other users see changes live, or only after refreshing? → A: Live. Changes appear for every
   user viewing the affected board or task without a refresh. (Derived from the user's planning
   input; aligns the spec with the planned real-time updates.)
+- Q: How are input limits counted, trimmed and reported, and how may a task be moved? → A: Limits
+  count characters, where each letter, digit, space, punctuation mark or emoji counts as one;
+  leading and trailing spaces, tabs, line breaks and non-breaking spaces are trimmed; errors appear
+  next to the field and name the rule; a move names one of the four columns and an optional
+  position, and a position past the end means the bottom. (Recommended defaults from requirements
+  review CHK003–CHK006, accepted by user delegation.)
+- Q: What must the audit log and error messages cover, and how are other users' items rejected? → A:
+  The audit log also records access denials and validation failures (no raw input), but not
+  notification creation or read state; it is kept for the whole phase. Errors may show only ids the
+  user already sees in links. Other users' comments are visible, so changing one is refused as
+  "not allowed"; other users' notifications are private, so they are refused as "not found".
+  (Recommended defaults from review CHK007–CHK012, accepted by user delegation.)
+- Q: What exactly updates live, and what happens during disconnections and conflicting edits? → A:
+  The project list (new projects, task counts), boards, task details and notifications all update
+  live; targets are measured on one machine with up to five open windows and boards up to 200
+  tasks; a "Reconnecting…" indicator shows while live updates are interrupted; a user's unsaved
+  edit is kept and a notice says the task changed, then the last save wins. (Recommended defaults
+  from review CHK014–CHK020, accepted by user delegation.)
+- Q: What do notifications say, and how do counts behave? → A: Creating a task with an assignee
+  counts as assigning it; each type has fixed wording; comment notifications show the first 140
+  characters of the comment; the task title is shown as it was at the time; "next visit" means the
+  next time the user is selected; the badge shows "99+" above 99; the count includes only kept
+  notifications; read state syncs across the user's windows; switching user replaces the panel
+  and count immediately. (Recommended defaults from review CHK021–CHK028, accepted by user
+  delegation.)
+- Q: What UX and accessibility details are required? → A: Loading placeholders for the board,
+  project list, task details and notification panel; "my task" marking is an accent edge plus a
+  "You" label; deleting a comment asks for confirmation; minimum window width 1024 px; contrast is
+  measured against the actual translucent background; the operating system's reduced-motion
+  setting turns off decorative motion; "not found" messages close by themselves after 6 seconds.
+  (Recommended defaults from review CHK029–CHK037 and CHK040, accepted by user delegation.)
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -201,8 +232,18 @@ and confirm the count drops.
 - Two users edit the same task's title, description, or assignee at nearly the same time: the last
   save wins, with no merge or conflict warning.
 - A user acts on a comment its author has just deleted, or opens a task or project that does not
-  exist (e.g., from a stale or edited link): a clear "not found" message is shown and the view
-  refreshes.
+  exist (e.g., from a stale or edited link): a clear "not found" message is shown, closes by itself
+  after 6 seconds (or earlier when dismissed), and the view refreshes.
+- A user is editing a task's title or description when another user changes the same task: the
+  unsaved text is kept, a notice says the task was changed by that user, and if they save, the last
+  save wins.
+- A user is dragging a card when another user moves the same card: the drop still applies, the
+  last move wins, and the board then shows the final position.
+- The live-update connection is interrupted: a "Reconnecting…" indicator is shown; once
+  reconnected, the open view, the notification list and the unread count reload and the indicator
+  disappears.
+- A stored user selection no longer matches one of the five users: the selection is cleared and
+  the user selection screen is shown.
 - Input contains HTML, script, or other markup: it is stored and displayed as plain text, never
   interpreted.
 - Input contains only whitespace: it is treated as empty and rejected.
@@ -214,7 +255,9 @@ and confirm the count drops.
   task; the deleted comment is not shown.
 - A task is assigned to someone and quickly reassigned: each assignment notifies its new assignee;
   earlier notifications are not withdrawn.
-- A user has more than 100 notifications: the oldest are removed so 100 remain.
+- A user has more than 100 notifications: the oldest are removed so 100 remain; removed ones no
+  longer count toward the unread number.
+- A user has more than 99 unread notifications: the bell badge shows "99+".
 - A user has no notifications: the panel shows "You're all caught up".
 
 ## Requirements *(mandatory)*
@@ -230,8 +273,9 @@ and confirm the count drops.
   reloads and cleared when the browser tab or window is closed.
 - **FR-003**: System MUST let the current user switch to a different predefined user at any time.
 - **FR-004**: System MUST NOT allow creating, editing, or deleting users in this phase.
-- **FR-005**: System MUST require a selected user before any project, task, or comment can be
-  viewed or changed.
+- **FR-005**: System MUST require a selected user before any project, task, comment, or
+  notification can be viewed or changed, and before live updates are delivered. A stored selection
+  that no longer matches a predefined user MUST be cleared.
 
 **Projects**
 
@@ -254,13 +298,19 @@ and confirm the count drops.
   to any other column, forward or backward and skipping columns, by drag and drop. Users MUST also
   have a non-drag way to change a task's column (e.g., for keyboard users). A dragged task is placed
   where it is dropped, including reordering within the same column; a task moved without dragging
-  is placed at the bottom of the target column.
-- **FR-014**: System MUST visually distinguish tasks assigned to the current user from all others.
+  is placed at the bottom of the target column. A move MUST name one of the four columns and may
+  give a position (0 or more); a position past the end of the column places the task at the
+  bottom.
+- **FR-014**: System MUST visually distinguish tasks assigned to the current user from all others
+  with an accent-colored edge and a visible "You" label on the card.
 - **FR-015**: System MUST persist all changes to projects, tasks, assignments, columns, and comments
-  so that they survive reloads and are visible to every user. Changes MUST appear for other users
-  viewing the affected board or task without a refresh; after a lost connection is restored, the
-  open view MUST reload so no change is missed.
+  so that they survive reloads and are visible to every user. Changes MUST appear without a refresh
+  for other users viewing the project list (new projects, task counts), the affected board, or the
+  affected task. While the live connection is interrupted, a "Reconnecting…" indicator MUST be
+  shown; after it is restored, the open view MUST reload so no change is missed.
 - **FR-016**: Each task card MUST show at least its title and assignee (or "Unassigned").
+- **FR-032**: System MUST show a loading placeholder while the board, project list, task details,
+  or notification panel are loading.
 
 **Comments**
 
@@ -271,48 +321,69 @@ and confirm the count drops.
 - **FR-019**: Only a comment's author MUST be able to edit or delete it, at any time; no role,
   including the Product Manager, is exempt. System MUST reject edits or deletions of another user's
   comment, including attempts that bypass the interface. Edited comments MUST be marked as edited.
-  Deleted comments MUST be removed from the task for all users, with no placeholder.
+  Deleted comments MUST be removed from the task for all users, with no placeholder. Deleting a
+  comment MUST ask the author to confirm first. Because comments are visible to everyone, an attempt
+  to change another user's comment is refused as "not allowed".
 
 **Validation and security**
 
 - **FR-020**: System MUST validate every input on the server side against the limits above, trim
-  leading and trailing whitespace, and reject invalid input with a clear message, without changing
-  any stored data.
-- **FR-021**: System MUST treat all user-entered text as plain text when displayed; markup and
-  scripts MUST never be executed.
+  leading and trailing whitespace (spaces, tabs, line breaks, non-breaking spaces; text inside is
+  kept as entered), and reject invalid input without changing any stored data. Limits count
+  characters: each letter, digit, space, punctuation mark or emoji counts as one. The error message
+  MUST appear next to the affected field, name the field and the rule broken (e.g., "Title is
+  required. Enter 1 to 200 characters."), and keep the user's input; a form with errors also shows a
+  short summary at the top.
+- **FR-021**: System MUST treat all user-entered text as plain text wherever it is displayed,
+  including boards, task details, comments, notifications, breadcrumbs, and browser tab titles;
+  markup and scripts MUST never be executed.
 - **FR-022**: System MUST reject any request that references a non-existent or unknown user,
   project, task, column, or comment.
 - **FR-023**: System MUST record an audit entry for each create, update, move, assignment, and
-  delete, including which user performed it and when. The audit log is available to maintainers
-  only; it is not viewable in the app in this phase.
-- **FR-024**: Error messages MUST NOT reveal internal details such as stack traces or system
-  identifiers beyond what the user already sees.
+  delete, and for each refused request (no selected user, not allowed, validation failure),
+  including which user performed it (if any), what was attempted, and when. Entries for refused
+  requests MUST NOT store the submitted text. Notification creation and read state are not audited.
+  Audit entries are kept for the whole phase. The audit log is available to maintainers only; it is
+  not viewable in the app in this phase.
+- **FR-024**: Error messages MUST NOT reveal internal details such as stack traces, database or file
+  details, server names, or identifiers other than those the user already sees in links (project
+  and task numbers).
 
 **Accessibility**
 
-- **FR-025**: All screens MUST meet WCAG 2.1 Level AA. Every action, including moving tasks, MUST be
-  possible with a keyboard alone, and the highlight for the current user's tasks MUST NOT rely on
-  color alone.
+- **FR-025**: All screens MUST meet WCAG 2.1 Level AA, with text contrast measured against the
+  actual translucent background it appears on. Every action, including moving tasks, opening and
+  using the notification panel, assigning, and confirming a comment deletion, MUST be possible with
+  a keyboard alone; closing a panel or dialog returns focus to the control that opened it. The
+  highlight for the current user's tasks MUST NOT rely on color alone. When the operating system's
+  reduced-motion setting is on, decorative motion (card tilt, shimmer) MUST be turned off.
+  Screens MUST work at desktop window widths of 1024 px and wider.
 
 **Notifications**
 
 - **FR-026**: System MUST create a notification for a user when another user (a) assigns a task to
-  them, (b) comments on a task assigned to them, or (c) moves a task assigned to them to a different
-  column. System MUST NOT create a notification for a user's own actions or for reordering within
-  the same column.
+  them, including creating a task with them as assignee, (b) comments on a task assigned to them, or
+  (c) moves a task assigned to them to a different column. System MUST NOT create a notification for
+  a user's own actions or for reordering within the same column.
 - **FR-027**: Each notification MUST record its recipient, the user who caused it, the event type,
-  the task (and project) it concerns, its creation time, and whether it has been read.
+  the task (and project) it concerns, the task title as it was at that moment, its creation time,
+  and whether it has been read. Comment notifications also record the first 140 characters of the
+  comment, which MUST be removed if the comment is deleted.
 - **FR-028**: System MUST show a bell in the top navigation bar with the current user's unread
-  count, and a panel listing their notifications newest first. Selecting a notification MUST open
-  its task and mark it read; users MUST be able to mark all as read. Users cannot delete
-  notifications.
+  count ("99+" above 99, hidden at 0), and a panel listing their notifications newest first. Each
+  row reads "<Actor> assigned you <task>", "<Actor> commented on <task>" with the comment preview,
+  or "<Actor> moved <task> to <column>", followed by the project name and time. Selecting a
+  notification MUST open its task and mark it read; users MUST be able to mark all as read. Users
+  cannot delete notifications. Read state MUST be the same in all of the user's open windows.
 - **FR-029**: A notification MUST reach its recipient within 2 seconds while they have Taskify open,
-  without a refresh, and MUST be listed on their next visit otherwise. Notifications are separate
-  from the live board updates in FR-015.
+  without a refresh, and MUST be listed the next time they are selected otherwise. Notifications
+  are separate from the live board updates in FR-015.
 - **FR-030**: System MUST keep the 100 most recent notifications per user and remove older ones
-  automatically.
+  automatically; the unread count includes only kept notifications.
 - **FR-031**: System MUST show and deliver each notification only to its recipient, and MUST reject
-  any attempt to read or mark another user's notifications.
+  any attempt to read or mark another user's notifications as "not found" (without revealing that
+  it exists). When the user switches identity, the bell and panel MUST switch to the new user's
+  notifications immediately, never showing the previous user's.
 
 ### Key Entities
 
@@ -323,11 +394,11 @@ and confirm the count drops.
 - **Task**: A unit of work within one project. Has a title, optional description, current column
   (status), optional assignee (a User), position within its column, and created/updated times.
 - **Comment**: A message on a task. Has text, author (a User), creation time, and an edited marker.
-- **Audit Entry**: A record of a change: who made it, what was changed, and when.
+- **Audit Entry**: A record of a change or a refused request: who made it, what was changed or
+  attempted, and when.
 - **Notification**: A message to one user about a change to their work. Has recipient (a User),
-  actor (a User), event type (assigned, commented, moved), the task and project concerned, creation
-  time, and read state.
-
+  actor (a User), event type (assigned, commented, moved), the task and project concerned, the task
+  title at that moment, an optional comment preview, creation time, and read state.
 ## Security Considerations
 
 Required by Constitution Principle I.
@@ -335,8 +406,9 @@ Required by Constitution Principle I.
 - **Authentication (deliberate deviation for this phase)**: There is no login; anyone who can reach
   Taskify can act as any of the five users. User selection is an identity choice, not proof of
   identity. This is acceptable only because phase 1 is a demo with predefined users and sample
-  data. Taskify MUST NOT be exposed to untrusted networks or hold real confidential data until
-  authentication is added. The plan MUST record this deviation in its Constitution Check.
+  data. Until authentication is added, Taskify MUST accept connections only from the same machine
+  it runs on and MUST NOT hold real confidential data. The plan MUST record this deviation in its
+  Constitution Check.
 - **Authorization**: Even without login, the server MUST enforce the rules it can: a user may edit
   or delete only their own comments (FR-019), users see and change only their own notifications
   (FR-031), and every request MUST name a valid selected user (FR-005).
@@ -355,7 +427,9 @@ Required by Constitution Principle I.
   column within 1 minute without instructions.
 - **SC-002**: A user can create and assign a new task in under 30 seconds.
 - **SC-003**: A moved task appears in its new column for the user who moved it within 1 second, and
-  appears for other users viewing the same board within 2 seconds, without a refresh.
+  appears for other users viewing the same board within 2 seconds, without a refresh. (All timing
+  targets in SC-003, SC-007 and SC-009 are measured on one machine with up to five open windows and
+  boards of up to 200 tasks.)
 - **SC-004**: 100% of changes (task moves, edits, assignments, comments, new projects) are still
   present after reloading Taskify.
 - **SC-005**: 100% of invalid inputs (empty, over-length, unknown references, markup) are rejected
@@ -363,8 +437,8 @@ Required by Constitution Principle I.
 - **SC-006**: 0 cases in which a user can edit or delete another user's comment.
 - **SC-007**: A board with 200 tasks loads within 3 seconds, and a dropped task shows in its new
   position within 1 second.
-- **SC-008**: In a walkthrough, all five sample users can each identify their own assigned tasks on
-  a board at a glance.
+- **SC-008**: In a walkthrough on a board of at least 20 tasks, each of the five sample users points
+  out all of their own assigned tasks, and no others, within 10 seconds.
 - **SC-009**: A notification appears in its recipient's unread count within 2 seconds while they
   have Taskify open.
 - **SC-010**: 0 notifications are created for a user's own actions, and 0 notifications are shown to
@@ -382,8 +456,10 @@ Required by Constitution Principle I.
 - Changes are shown live to other users viewing the same board or task; presence indicators (who
   else is viewing) are out of scope.
 - Notifications are in-app only; email, push, and other outside channels, notification settings,
-  and pop-up alerts are out of scope. Due dates, labels, attachments, search, and file uploads are
-  also out of scope for this phase.
+  and pop-up alerts are out of scope. Due dates, labels/tags, attachments, search, filters, and file
+  uploads are also out of scope for this phase, as are other elements sometimes shown in mockups:
+  ticket numbers, sprints, timeline or analytics views, checklists or progress bars on cards,
+  priority flags, and adding or changing columns.
 - Taskify is built as a single application (monolith) in this phase, organized by domain (users,
   projects, tasks, comments, notifications, audit) so domains can be separated later.
 - Taskify is used on desktop web browsers; mobile layout is out of scope for this phase.

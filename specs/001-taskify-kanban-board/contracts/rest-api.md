@@ -14,7 +14,9 @@ machine-readable form of this contract. The committed copy at
   response header and error body.
 - **Timestamps**: ISO 8601 UTC, e.g. `2026-10-11T09:02:00Z`.
 - **Columns**: `todo`, `in_progress`, `in_review`, `done`.
-- **Strings** are trimmed server-side; unknown body fields are rejected.
+- **Strings** are NFC-normalized and trimmed server-side; length limits count user-perceived
+  characters (an emoji counts as one; research R14); unknown body fields are rejected.
+- **Binding**: the API listens on `127.0.0.1` only in this phase (spec Security Considerations).
 - **Not provided in this phase**: delete or update of projects, delete of tasks, any user
   mutation, deleting notifications, audit log access.
 
@@ -31,13 +33,18 @@ machine-readable form of this contract. The committed copy at
 }
 ```
 
+Field messages name the field and the rule broken (e.g., "Title is required. Enter 1 to 200
+characters."); `message` is the short form-level summary (FR-020). Messages never contain stack
+traces, database or file details, server names, or ids other than project and task numbers
+(FR-024).
+
 | Status | Code | When |
 |--------|------|------|
-| 401 | `user_required` | No valid selected user |
-| 403 | `not_comment_author` | Editing or deleting another user's comment |
-| 404 | `not_found` | Project, task, comment or user does not exist |
+| 401 | `user_required` | No valid selected user (audited) |
+| 403 | `not_comment_author` | Editing or deleting another user's comment ("not allowed"; audited) |
+| 404 | `not_found` | Project, task, comment or user does not exist, or a notification belongs to someone else |
 | 409 | `project_name_taken` | Project name already used (ignoring case) |
-| 422 | `validation_error` | Body, query or path fails validation; `fields` lists each problem |
+| 422 | `validation_error` | Body, query or path fails validation; `fields` lists each problem (audited, without field values) |
 | 500 | `internal_error` | Unexpected failure; generic message only |
 
 ## Resources
@@ -134,5 +141,7 @@ Every successful mutation (POST, PATCH, move, DELETE) in one transaction:
 4. after commit, publishes the matching board event to everyone and each `notification.created`
    event to its recipient only.
 
-A failed request changes nothing (FR-020). Marking notifications read changes only `read_at` and
+A failed request changes nothing (FR-020). Refused requests (401, 403, 422) additionally write one
+`request.refused` audit entry with the reason and route template, but never the submitted values
+(FR-023, research R14). Marking notifications read changes only `read_at` and
 publishes `notifications.read` to the same user's other connections; it writes no audit entry.

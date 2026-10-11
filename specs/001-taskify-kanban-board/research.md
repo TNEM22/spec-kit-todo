@@ -2,7 +2,8 @@
 
 **Feature**: [spec.md](spec.md) | **Plan**: [plan.md](plan.md) | **Date**: 2026-10-11
 
-Each entry records a decision, why it was chosen, and what else was considered. The stack itself
+Each entry records a decision, why it was chosen, and what else was considered. R14 was added after
+the requirements review and is placed before R13 because it refines R8, R6 and R7. The stack itself
 (FastAPI, SQLAlchemy async + SQLite, Alembic, Angular 21, CDK DragDrop, WebSocket) was given by the
 user; the entries below resolve how to use it and the gaps the input left open.
 
@@ -21,9 +22,8 @@ user; the entries below resolve how to use it and the gaps the input left open.
 - **Alternatives considered**: Separate FastAPI services per domain with an API gateway (rejected:
   needs process orchestration and inter-service auth the phase does not have); unstructured monolith
   (rejected: would make later extraction costly and violates the spirit of III).
-- **Constitution impact**: Constitution v1.0.0 Principle III still requires microservices, so this
-  remains a justified deviation in plan.md Complexity Tracking until the constitution is amended
-  (`/speckit-constitution`).
+- **Constitution impact**: Constitution v2.0.0+ Principle III ("Modular Monolith Architecture") now
+  requires exactly this structure, so it is no longer a deviation.
 
 ## R2. Identity without login (FR-002, FR-005, clarification on session persistence)
 
@@ -204,6 +204,77 @@ user; the entries below resolve how to use it and the gaps the input left open.
   include request bodies, comment text, or headers other than the request id.
 - **Alternatives considered**: Prometheus client (rejected for now: extra dependency with no
   scraper in a local setup; the JSON endpoint can be swapped later).
+
+## R14. Requirements-review follow-ups (spec clarifications of 2026-10-11, review CHK001–CHK040)
+
+### Character counting and trimming (FR-020)
+
+- **Decision**: Limits count **user-perceived characters (grapheme clusters)**, after Unicode NFC
+  normalization and trimming. Backend: the `regex` package's `\X` pattern counts clusters
+  (`len(regex.findall(r"\X", text))`), wrapped in one reusable Pydantic validator. Frontend: the
+  same rule with `Intl.Segmenter(undefined, { granularity: "grapheme" })` for the live counters, so
+  "19 / 200" in the UI matches what the server accepts. Trimming uses Python `str.strip()` and
+  JavaScript `String.prototype.trim()`, both of which remove spaces, tabs, line breaks and
+  non-breaking spaces; inner text is kept.
+- **Storage**: Databases measure length in bytes or code points, not clusters, and one emoji can be
+  up to ~10 code points, so every user-entered text column is `Text`. Validation, not the column
+  size, enforces the limit.
+- **Rationale**: The spec says each emoji counts as one; `len()` on Python strings counts code
+  points, so "👨‍👩‍👧" would count as 5 and the UI and server would disagree.
+- **Alternatives considered**: Code points (rejected: contradicts the spec for combined emoji and
+  flags); UTF-16 units (rejected: what JavaScript `.length` returns, and differs from Python).
+- **Dependency**: adds the `regex` package (a library, not a framework; pinned like the others).
+
+### Audit of refused requests (FR-023, Constitution V)
+
+- **Decision**: The error handlers for `401 user_required`, `403 not_comment_author` and
+  `422 validation_error` write an `AuditEntry` with action `request.refused`, the reason code, the
+  HTTP method and route template (e.g., `PATCH /comments/{comment_id}`), the actor if a valid user
+  was selected, and the request id. They never store the request body or field values. The entry is
+  written in its own short transaction, because the failed request's transaction was rolled back.
+  WebSocket handshakes refused with 4401/4403 are logged and audited the same way.
+- **Rationale**: The spec now requires refused requests to be audited without storing submitted
+  text, which also satisfies Constitution Principle V.
+- **Not audited**: `404 not_found` (not listed in the spec) and notification creation or read state.
+
+### Rejection semantics (FR-019, FR-031)
+
+- **Decision**: Changing another user's comment → `403 not_comment_author` ("not allowed"), because
+  comments are visible to everyone. Reading or marking another user's notification → `404
+  not_found`, because notifications are private. Both are now stated in the spec, so the
+  difference is intentional.
+
+### Live updates beyond the board (FR-015)
+
+- **Decision**: The project list updates live too: `ProjectsStore` handles `project.created` and
+  derives per-column counts from `task.created` and `task.moved` (the event's `columns` lists give
+  the new lengths). `RealtimeService` exposes a `status` signal (`connected` | `reconnecting`);
+  `shared/ui/connection-indicator` shows "Reconnecting…" whenever it is `reconnecting`.
+- **Mid-drag (spec edge case)**: While a CDK drag is in progress, `BoardStore` queues incoming
+  events and applies them after the drop's move request completes, so the board ends in the final
+  server order (last move wins) without the dragged card jumping.
+- **Editing conflicts (spec edge case)**: When `task.updated` arrives for the task open in the
+  drawer while the user has unsaved changes in a field, the drawer keeps the user's text and shows
+  "<Actor> changed this task" (actor name from the event's `actor_id`). Saving sends the user's
+  value; the last save wins. Fields without unsaved changes update in place.
+
+### Identity edge cases (FR-005)
+
+- **Decision**: A stored selection is checked with `GET /users/me` on start; `401` clears
+  `sessionStorage` and routes to `/select-user`. Switching user closes the WebSocket, clears
+  `NotificationsStore`, `BoardStore` caches and comment state, then reconnects with the new id, so
+  the previous user's notifications are never shown (FR-031).
+
+### UX and accessibility details (FR-025, FR-028, FR-032)
+
+- **Decision**: `base.css` applies `prefers-reduced-motion: reduce` to turn off drag tilt, skeleton
+  shimmer and panel transitions. The app shell has `min-width: 1024px`; narrower windows scroll
+  horizontally. Contrast for text on glass is checked against the rendered background in the
+  accessibility pass (quickstart), and lane glass is raised from the export's `white/0.04` as needed
+  (tokens plan). The unread badge renders "99+" above 99 and is hidden at 0. Not-found toasts
+  auto-dismiss after 6 s.
+- **Timing measurement (SC-003, SC-007, SC-009)**: Performance tests run on one machine with five
+  connected clients and a seeded 200-task board, matching the spec's stated conditions.
 
 ## R13. Local security posture (constitution Security Requirements)
 

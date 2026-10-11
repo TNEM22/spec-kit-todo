@@ -14,8 +14,8 @@ REST stays the only way to change data.
 
 | Check | Failure |
 |-------|---------|
-| `Origin` header is in the allowed CORS origins | Close `4403 origin_not_allowed` |
-| `user` query parameter is an existing user id | Close `4401 user_required` |
+| `Origin` header is in the allowed CORS origins | Close `4403 origin_not_allowed` (logged and audited) |
+| `user` query parameter is an existing user id | Close `4401 user_required` (logged and audited) |
 
 On success the server sends `{"type": "hello", "data": {"user_id": <id>}}`. The server registers the
 socket under that user id for targeted delivery. When the user switches identity, the client closes
@@ -71,9 +71,19 @@ events caused by their own requests.
 
 ## Client behavior
 
-- Reconnect with exponential backoff (1 s doubling to 30 s).
+- Reconnect with exponential backoff (1 s doubling to 30 s). While not connected, show the
+  "Reconnecting…" indicator (FR-015).
 - After a reconnect, reload the open board, the project list and `GET /notifications` over REST,
-  because events sent while disconnected are not replayed (FR-015, FR-029).
+  because events sent while disconnected are not replayed (FR-015, FR-029), then hide the
+  indicator.
+- Keep the project list current from `project.created`, `task.created` and `task.moved` (column
+  counts come from the `columns` lists) (FR-015).
+- While the user is dragging a card, queue incoming board events and apply them after the drop's
+  move request completes (spec edge case; research R14).
+- When `task.updated` arrives for the task open in the drawer and a field has unsaved changes, keep
+  the user's text and show "<Actor> changed this task"; update unchanged fields in place.
+- On switching user, close the socket, clear all per-user state (notifications, open task, drafts)
+  and reconnect with the new id (FR-031).
 - On `comment.deleted` for a comment the user is editing, close the editor and show the
   "That comment no longer exists" toast (design `not-found-toast`).
 - On `notification.created`, update the bell count and, if the panel is open, insert the item at the

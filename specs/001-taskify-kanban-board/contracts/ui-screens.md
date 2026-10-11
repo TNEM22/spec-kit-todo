@@ -23,10 +23,20 @@ scope (US5).
 - **Realtime**: `RealtimeService` connects after a user is selected and feeds `ProjectsStore`,
   `BoardStore`, `CommentsStore` and `NotificationsStore`. On reconnect it reloads all four over
   REST.
+- **Connection indicator** (`shared/ui/connection-indicator`): a small "Reconnecting…" pill in the
+  top navigation bar while `RealtimeService.status` is `reconnecting`; hidden otherwise (FR-015).
 - **Errors**: 401 anywhere → clear selection, go to `/select-user`. 404 → "not found" toast and
   refresh of the current view. 500 → toast "Something went wrong. Try again." with no details.
-- **Accessibility (FR-025)**: WCAG 2.1 AA; every action keyboard-operable; visible teal focus ring;
-  "my task" marked by the "You" chip, not color alone; dialogs trap focus and restore it on close.
+- **Forms (FR-020)**: each field shows its error directly below it, naming the field and the rule;
+  a form with errors also shows a summary at the top; input is kept. Character counters count
+  user-perceived characters (an emoji counts as one) with the same rule as the server.
+- **Accessibility (FR-025)**: WCAG 2.1 AA with contrast measured on the real glass background; every
+  action keyboard-operable; visible teal focus ring; "my task" marked by an accent edge plus the
+  "You" label, not color alone; dialogs, menus and the notification panel trap or manage focus and
+  return it to the opener on close; `prefers-reduced-motion` turns off tilt, shimmer and
+  transitions.
+- **Window size**: designed for 1024 px and wider; narrower windows scroll horizontally.
+- **User text**: shown as plain text everywhere, including page titles and breadcrumbs (FR-021).
 
 ---
 
@@ -54,7 +64,8 @@ scope (US5).
 - **Actions**:
   - "Open board" or activate a card → `/projects/:projectId`
   - "New project" → opens `project-create` dialog
-- **Realtime**: `project.created` adds a card; task events refresh counts
+- **Realtime**: `project.created` adds a card; `task.created` and `task.moved` update the
+  per-column counts and the "assigned to you" badge live, without a refresh (FR-015)
 - **States**: loading skeleton grid; empty list (not expected after seed; show "No projects yet"
   with "New project"); load error with retry
 
@@ -94,7 +105,9 @@ scope (US5).
   - Card "Move to" menu (see `card-move-menu`) → `POST /tasks/:id/move` without `position`
   - Open a card (click or Enter) → `/projects/:projectId/tasks/:taskId` (drawer)
   - "New task" → opens `task-create` dialog
-- **Realtime**: `task.created`, `task.updated`, `task.moved` for this project update the board
+- **Realtime**: `task.created`, `task.updated`, `task.moved` for this project update the board;
+  while a card is being dragged, incoming events are queued and applied after the drop completes,
+  so the final order is the server's (last move wins)
 - **States**: loading (`board-loading`), empty (`board-empty`), not found project (toast and
   redirect to `/projects`), card mid-drag with dashed teal drop zone, narrow window (1024px)
   horizontal scroll with snap
@@ -158,9 +171,11 @@ scope (US5).
   - Add comment → `POST /tasks/:taskId/comments` (FR-017)
   - Edit / Delete on own comments only → see `comment-edit` (FR-019)
   - Close (icon, Escape, click on dimmed board) → back to `/projects/:projectId`
-- **Realtime**: `task.updated`, `task.moved`, `comment.*` for this task update the drawer
+- **Realtime**: `task.updated`, `task.moved`, `comment.*` for this task update the drawer. If a
+  field has unsaved changes when `task.updated` arrives, the user's text is kept and an inline
+  notice says "<Actor> changed this task"; saving then overwrites (last save wins)
 - **States**: loading skeleton; task not found (toast, close drawer); comment composer validation
-  error (empty or over 2000 chars); no comments ("No comments yet")
+  error (empty or over 2,000 characters); no comments ("No comments yet"); edit-conflict notice
 
 ## comment-edit — Editing my own comment
 
@@ -169,8 +184,9 @@ scope (US5).
 - **Behavior**:
   - Edit: inline text area with counter `n / 2000`, "Save" → `PATCH /comments/:id`, "Cancel"
     restores the original text
-  - Delete: confirmation popover "Delete this comment? This can't be undone." → `DELETE
-    /comments/:id`; the comment disappears with no placeholder
+  - Delete: confirmation popover "Delete this comment? This can't be undone." (required by FR-019;
+    keyboard-operable, focus returns to the comment) → `DELETE /comments/:id`; the comment
+    disappears with no placeholder
   - Other users' comments show no actions; a `403` (e.g., stale UI) shows a toast and refreshes
     comments
   - Markup in comments renders as plain text
@@ -184,9 +200,11 @@ scope (US5).
   `features/notifications/notification-item/`, state in `core/state/notifications.store.ts`
 - **Inputs**: selected user
 - **Data**: `GET /notifications` on user selection and after reconnect → unread count on the bell
-  badge (hidden at 0, "99+" above 99) and the list, newest first. Each row: actor avatar, sentence
-  ("assigned you", "commented on", "moved … to <column>"), task title, comment preview for comments,
-  project name, relative time, event icon, unread dot.
+  badge (hidden at 0, "99+" above 99) and the list, newest first. Each row (FR-028 wording):
+  actor avatar; "<Actor> assigned you <task>", "<Actor> commented on <task>" plus the comment
+  preview (up to 140 characters, omitted if the comment was deleted), or "<Actor> moved <task> to
+  <column>"; the task title as it was at the time; project name; relative time; event icon; unread
+  dot plus a visually hidden "Unread" label.
 - **Actions**:
   - Open/close the panel (click, Enter/Space on the bell; Escape or click outside closes and returns
     focus to the bell)
@@ -194,7 +212,8 @@ scope (US5).
     `/projects/:projectId/tasks/:taskId`
   - "Mark all as read" → `POST /notifications/read-all`
 - **Realtime**: `notification.created` increments the badge and inserts the row if the panel is open;
-  `notifications.read` syncs other tabs. No pop-up toast.
+  `notifications.read` syncs read state across all of the user's windows. No pop-up toast. On
+  "Switch user" the badge and list are cleared at once and reloaded for the new user (FR-031).
 - **States**: unread and read rows; loading (three skeleton rows); load error (inline message with
   retry); task no longer reachable (404 on open → not-found toast); empty → `notifications-empty`
 - **Accessibility**: bell has `aria-label="Notifications, N unread"` and `aria-expanded`; the panel

@@ -7,9 +7,12 @@ PowerShell on Windows; use the equivalent paths on macOS or Linux.
 
 ## Prerequisites
 
-- Python 3.12
-- Node.js LTS supported by Angular 21, with npm
-- Angular CLI 21 (`npm install -g @angular/cli@21`)
+Versions follow the constitution's Technology Stack (verified on the development machine on
+2026-10-11):
+
+- Python 3.12.x (verified 3.12.10); the repo's `.python-version` says `3.12`
+- Node.js 24.x LTS (verified 24.14.0) and npm 11.x (verified 11.11.0); the repo's `.nvmrc` says `24`
+- Angular CLI 21.x (verified 21.2.0; `npm install -g @angular/cli@21`)
 - No Docker and no database server: SQLite is a local file
 
 ## 1. Backend setup
@@ -79,8 +82,8 @@ fresh rather than duplicating a tab, which copies the selection.
 | 13 | Create project | New project "Mobile App"; then "mobile app" again | Empty four-column board; second attempt shows duplicate-name error | US4-1, US4-2 |
 | 14 | No user header | `GET /api/v1/projects` without `X-Taskify-User` | `401 user_required` | FR-005 |
 | 15 | Stale link | Open `/projects/1/tasks/99999` | "Not found" toast; drawer closes | Edge cases, FR-022 |
-| 16 | Audit trail | After the steps above, inspect `audit_entries` in `taskify.db` | One entry per change with actor and time; none for no-op moves | FR-023 |
-| 17 | Large board | Run the 200-task load test (`pytest -m perf`) | Board load < 3 s; move reflected < 1 s | SC-007 |
+| 16 | Audit trail | After the steps above, inspect `audit_entries` in `taskify.db` | One entry per change with actor and time; none for no-op moves or notifications | FR-023 |
+| 17 | Large board | Run the 200-task load test (`pytest -m perf`) | Board load < 3 s; move reflected < 1 s (see scenario 35 for full conditions) | SC-007 |
 | 18 | Keyboard and contrast | Navigate every screen with keyboard only; run an accessibility checker | All actions reachable; no AA contrast failures | FR-025 |
 | 19 | Assignment notification | Window A as Alex Morgan, window B as Sam Lee. Alex assigns a task to Sam | Sam's bell count rises within 2 s without reload; panel shows "Alex Morgan assigned you …" | US5-1, FR-026, FR-029, SC-009 |
 | 20 | Comment and move notifications | Alex comments on, then moves, a task assigned to Sam | Two more unread notifications for Sam, with comment preview and "to <column>" | US5-1, FR-026 |
@@ -91,6 +94,15 @@ fresh rather than duplicating a tab, which copies the selection.
 | 25 | Deleted comment preview | Alex comments on Sam's task, then deletes the comment | Sam's notification remains and opens the task; no comment text is shown | Edge cases |
 | 26 | Retention | Run `pytest -k notification_retention` (creates 105 notifications for one user) | Exactly the newest 100 remain | FR-030 |
 | 27 | Empty panel | Pick a user with no notifications and open the bell | "You're all caught up"; "Mark all as read" disabled | Edge cases, design `notifications-empty` |
+| 28 | Reconnecting | With the board open, stop the backend for 10 s, move a task in another window after restarting | "Reconnecting…" shows while stopped; after restart it disappears and the board, list and unread count reload | FR-015, edge cases |
+| 29 | Edit conflict | Window A starts editing a task's title without saving; window B renames the same task | A keeps its text and shows "<B's user> changed this task"; saving A overwrites | Edge cases |
+| 30 | Emoji counting | Create a task whose title is 200 family emoji "👨‍👩‍👧"; then 201 | 200 accepted (counter shows 200 / 200); 201 rejected with the field message | FR-020, research R14 |
+| 31 | Refused requests audited | Send a request without `X-Taskify-User`, an invalid task title, and another user's comment edit; inspect `audit_entries` | Three `request.refused` rows with reasons `user_required`, `validation_error`, `not_comment_author`; no submitted text stored | FR-023 |
+| 32 | Live project list | Window A on the project list, window B creates a project and moves a task | A shows the new project and updated counts within 2 s | FR-015 |
+| 33 | Reduced motion | Turn on the OS "reduce motion" setting; drag a card and open the board while loading | No tilt or shimmer; everything else works | FR-025 |
+| 34 | Minimum width | Resize the window to 1024 px | All screens usable; the board scrolls horizontally if needed | FR-025 |
+| 35 | Timing conditions | Run `pytest -m perf` (5 WebSocket clients, seeded 200-task board) | Board load < 3 s; move < 1 s for the mover and < 2 s for others; notification < 2 s | SC-003, SC-007, SC-009 |
+| 36 | Local only | From another machine on the network, open `http://<dev-machine-ip>:8000/api/v1/health` | Connection refused | Spec Security Considerations |
 
 ## 5. Reset local data
 
