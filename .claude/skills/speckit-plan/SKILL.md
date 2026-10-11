@@ -60,6 +60,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 1. **Setup**: Run `python3 .specify/scripts/python/setup_plan.py --json` from repo root and parse JSON for FEATURE_SPEC, IMPL_PLAN, FEATURE_DIR, BRANCH. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
 2. **Load context**: Read FEATURE_SPEC and `.specify/memory/constitution.md`. Load IMPL_PLAN template (already copied).
+   - **IF EXISTS**: Read the UI design artifacts from `/speckit-design-plan` and `/speckit-design-import`: `FEATURE_DIR/design/manifest.md`, `FEATURE_DIR/design/tokens.md`, `FEATURE_DIR/design-prompt.md`, and the files under `FEATURE_DIR/design/screens/`. These drive Phase 1 step 4 (UI Design Implementation).
 
 3. **Execute plan workflow**: Follow the structure in IMPL_PLAN template to:
    - Fill Technical Context (mark unknowns as "NEEDS CLARIFICATION")
@@ -67,6 +68,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Evaluate gates (ERROR if violations unjustified)
    - Phase 0: Generate research.md (resolve all NEEDS CLARIFICATION)
    - Phase 1: Generate data-model.md, contracts/, quickstart.md
+   - Phase 1: Plan the frontend implementation of every unimplemented UI design (if a design manifest exists)
    - Re-evaluate Constitution Check post-design
 
 ## Mandatory Post-Execution Hooks
@@ -107,6 +109,7 @@ Check if `.specify/extensions.yml` exists in the project root.
 ## Completion Report
 
 Command ends after Phase 1 design. Report branch, IMPL_PLAN path, and generated artifacts.
+If a design manifest exists, also report the number of designs planned for frontend implementation, the number already implemented, and any screens still `planned` (with a suggestion to paste their prompts into Stitch and run `/speckit-design-import` first).
 
 ## Phases
 
@@ -155,7 +158,26 @@ Command ends after Phase 1 design. Report branch, IMPL_PLAN path, and generated 
    - Do not include full implementation code, model/service/controller bodies, migrations, or complete test suites
    - Keep this artifact as a validation/run guide; implementation details belong in `tasks.md` and the implementation phase
 
-**Output**: data-model.md, /contracts/*, quickstart.md
+4. **UI Design Implementation** (only if `FEATURE_DIR/design/manifest.md` exists; skip silently otherwise):
+   - **Find unimplemented designs**: For each manifest row with `Status` = `generated`, or `implemented` but now in doubt, search the frontend source code (using the Project Structure from this plan) for a page, route, or component that renders that screen. A row counts as implemented only if such code exists and visibly matches the design: its layout regions, key components, and states. Set `Status` to `implemented` and fill `Implemented In` with the file path(s) for rows that are; leave all other rows unchanged. This is the only edit `/speckit-plan` makes to the manifest.
+   - Rows still `planned` (prompt written but no design generated) are listed under "Pending designs" and are NOT planned for implementation. Rows marked `removed` are ignored.
+   - **Add a `## UI Design Implementation` section to IMPL_PLAN** (after Project Structure) containing:
+     - **Design source**: links to `design/manifest.md`, `design/tokens.md`, and `design-prompt.md`.
+     - **Design tokens plan**: how the tokens in `design/tokens.md` become frontend theme values (e.g. CSS variables or a theme file) at a concrete path in the chosen frontend structure. Plan this once, as shared setup.
+     - **Shared components**: UI components reused across 2 or more screens (e.g. avatar, task card, badge, modal shell), each with a target frontend path.
+     - **Screen implementation table**, one row per unimplemented generated design:
+
+       | Slug | Screen | User Story | Design Reference | Frontend Target (page/component paths) | Shared Components Used | States to Build | Data/Contract Dependencies |
+       |------|--------|------------|------------------|----------------------------------------|------------------------|-----------------|----------------------------|
+
+       `Design Reference` points to `design/screens/<slug>/screen.html` and/or `screen.png`. `States to Build` lists the empty/loading/error/edge states from the design and spec. `Data/Contract Dependencies` names the entities in data-model.md and the contracts that the screen needs.
+     - **Already implemented**: slugs and their `Implemented In` paths. Do not plan these again.
+     - **Pending designs**: slugs still `planned`.
+     - **Implementation rules**: the Stitch HTML is a visual reference, not production code. Rebuild it with the plan's frontend stack and components, apply the design tokens instead of hard-coded values, keep accessibility (contrast, keyboard access, labels) at least as good as the design, and match layout and states from the screenshot.
+   - **Write `contracts/ui-screens.md`**: For each screen in the implementation table, write a UI contract: route/entry point, inputs (route params, selected user, etc.), data displayed, user actions and the contract/API each one calls, navigation targets, and required states. `/speckit-tasks` maps these to frontend tasks per user story.
+   - Add `design/` and `contracts/ui-screens.md` to the Documentation tree in Project Structure, and make sure the Source Code structure includes the frontend paths used in the table.
+
+**Output**: data-model.md, /contracts/*, quickstart.md, and (when designs exist) the UI Design Implementation section in plan.md plus contracts/ui-screens.md
 
 ## Key rules
 
@@ -165,5 +187,6 @@ Command ends after Phase 1 design. Report branch, IMPL_PLAN path, and generated 
 ## Done When
 
 - [ ] Plan workflow executed and design artifacts generated
+- [ ] If `design/manifest.md` exists: every generated but unimplemented design appears in the UI Design Implementation section and in `contracts/ui-screens.md`, and implemented designs are marked in the manifest
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
 - [ ] Completion reported to user with branch, plan path, and generated artifacts
