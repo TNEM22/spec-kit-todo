@@ -8,9 +8,10 @@ user; the entries below resolve how to use it and the gaps the input left open.
 
 ## R1. Service architecture vs. Constitution Principle III
 
-- **Decision**: One FastAPI process structured as a **modular monolith**. Domains (`users`,
-  `projects`, `tasks`, `comments`, `audit`, `realtime`) each own their tables, schemas and service
-  module. A service may read or write only its own tables; other domains are reached through their
+- **Decision**: One FastAPI process structured as a **modular monolith**, as the spec now states
+  (clarification: "One application (a monolith) in this phase, structured by domain"). Domains
+  (`users`, `projects`, `tasks`, `comments`, `notifications`, `audit`, `realtime`) each own their
+  tables, schemas and service module. A service may read or write only its own tables; other domains are reached through their
   service functions, never their models. The board view is composed in the `tasks` service by
   calling the `projects` and `users` services.
 - **Rationale**: The user asked for a single `/backend` app, local install, no Docker, single-user
@@ -20,7 +21,9 @@ user; the entries below resolve how to use it and the gaps the input left open.
 - **Alternatives considered**: Separate FastAPI services per domain with an API gateway (rejected:
   needs process orchestration and inter-service auth the phase does not have); unstructured monolith
   (rejected: would make later extraction costly and violates the spirit of III).
-- **Constitution impact**: Recorded as a justified deviation in plan.md Complexity Tracking.
+- **Constitution impact**: Constitution v1.0.0 Principle III still requires microservices, so this
+  remains a justified deviation in plan.md Complexity Tracking until the constitution is amended
+  (`/speckit-constitution`).
 
 ## R2. Identity without login (FR-002, FR-005, clarification on session persistence)
 
@@ -79,12 +82,13 @@ user; the entries below resolve how to use it and the gaps the input left open.
   rebalancing, unnecessary at this scale); client-sent full order lists (rejected: larger payloads
   and race-prone).
 
-## R6. Real-time updates (user input; spec allows refresh-only)
+## R6. Real-time updates (FR-015 live board updates, FR-029 notification delivery)
 
-- **Decision**: One WebSocket endpoint `GET /api/v1/ws?user=<id>`. An in-process
-  `ConnectionManager` holds open sockets. Services publish domain events **after the transaction
-  commits**; the manager broadcasts them as JSON envelopes (see
-  [contracts/websocket.md](contracts/websocket.md)). Events carry the full updated resource so
+- **Decision**: One WebSocket endpoint `GET /api/v1/ws?user=<id>` carries two kinds of traffic:
+  **board events** broadcast to every connected client, and **notification events** sent only to
+  the sockets of the recipient. An in-process `ConnectionManager` keeps sockets grouped by user id.
+  Services publish events **after the transaction commits**; the manager sends them as JSON
+  envelopes (see [contracts/websocket.md](contracts/websocket.md)). Events carry the full updated resource so
   clients upsert idempotently, including events caused by their own requests. The Angular
   `RealtimeService` reconnects with exponential backoff (1s → 30s) and, after a reconnect, reloads
   the open board so missed events cannot leave stale state.
@@ -94,20 +98,46 @@ user; the entries below resolve how to use it and the gaps the input left open.
   `ping` are ignored.
 - **Constraint**: In-process broadcasting requires running Uvicorn with one worker. A broker
   (e.g., Redis pub/sub or PostgreSQL LISTEN/NOTIFY) is needed before scaling out; noted for later.
-- **Rationale**: Exceeds the spec's refresh requirement at low cost and gives immediate feedback on
-  every viewer's board.
+- **Rationale**: Meets FR-015 (changes appear without a refresh; reload after reconnect) and
+  FR-029/SC-009 (notifications within 2 seconds) with one connection per tab. Reusing the socket
+  for notifications avoids a second channel.
 - **Alternatives considered**: Server-Sent Events (rejected: user asked for WebSocket); polling
   (rejected: slower and wasteful).
 
-## R7. Notifications requested in the input
+## R7. Notifications (US5, FR-026 to FR-031)
 
-- **Decision**: **Not planned.** The spec lists notifications as out of scope for this phase, so no
-  notification entity, REST endpoints, or notification WebSocket events are included.
-- **Rationale**: The spec is the source of requirements; adding a feature it excludes needs a spec
-  change first. The WebSocket envelope has a `type` field, so notification events can be added
-  later without breaking clients.
-- **Follow-up**: If notifications are wanted, update the spec with `/speckit-specify` or
-  `/speckit-clarify`, then re-run `/speckit-plan`.
+- **Decision**: A `notifications` domain owns a `notifications` table. The `tasks` and `comments`
+  services call `notifications.notify(...)` **inside their own transaction**, so a notification
+  exists exactly when its triggering change commits. Rules, applied in one function so they are
+  unit-testable:
+  - `task_assigned`: on create with an assignee, or on assignee change, notify the new assignee.
+  - `task_commented`: on comment create, notify the task's assignee.
+  - `task_moved`: on a move to a **different column**, notify the task's assignee.
+  - Never notify the actor (`recipient == actor`), never notify when there is no assignee, and
+    never for reordering within the same column (FR-026).
+- **Content**: Each row stores `task_title` and, for moves, `to_column` as snapshots of what
+  happened; comment notifications store `comment_id` and a ≤140-character `comment_preview`. When a
+  comment is deleted, the comments service clears `comment_preview` on its notifications in the
+  same transaction, so a deleted comment's text is never shown (spec edge case).
+- **Retention (FR-030)**: After inserting, the service deletes the recipient's rows beyond the
+  newest 100 in the same transaction. Ordering by `(created_at, id)` keeps it deterministic.
+- **Delivery (FR-029)**: After commit, a `notification.created` event with the new unread count is
+  sent only to the recipient's sockets. Users who are offline get the list over REST on their next
+  visit. Marking read publishes `notifications.read` to the recipient's other tabs so counts stay in
+  sync.
+- **Access (FR-031)**: Every notification query filters by the selected user. Reading or marking a
+  notification that belongs to someone else returns `404 not_found` (it does not confirm that the
+  id exists). Notification text is rendered with Angular interpolation like all other user text.
+- **Audit**: Notifications are a side effect of audited changes, and read state is personal UI
+  state, so neither creation nor marking read writes audit entries (FR-023 lists the audited
+  changes).
+- **Alternatives considered**: Deriving notifications from the audit log at read time (rejected:
+  couples two domains and makes "read" state awkward); publishing an in-process event bus that a
+  notifications listener consumes after commit (rejected: a crash between commit and listener would
+  drop notifications); live task-title lookup when listing (rejected for now: needs a cross-domain
+  batch query for a cosmetic gain; snapshots also show what the task was called at the time).
+- **Not included**: email or push delivery, notification settings, deleting notifications (spec
+  Assumptions).
 
 ## R8. Validation and error responses (Principle II, FR-020 to FR-024)
 
@@ -158,7 +188,8 @@ user; the entries below resolve how to use it and the gaps the input left open.
   (Vitest through `ng test`) for components, stores and interceptors.
 - **Coverage focus**: every validation rule with malformed and markup inputs (SC-005), comment
   ownership (SC-006), move and renumber logic, case-insensitive project names, audit entries, error
-  envelope, WebSocket Origin and user checks.
+  envelope, WebSocket Origin and user checks, notification trigger rules including "never for own
+  actions" (SC-010), 100-per-user retention, recipient-only access and targeted delivery.
 - **Alternatives considered**: An in-memory SQLite database (rejected: does not exercise WAL or
   migrations and behaves differently across connections).
 

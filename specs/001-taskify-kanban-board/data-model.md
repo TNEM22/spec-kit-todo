@@ -12,8 +12,11 @@ owning service.
 User 1───* Task (assignee, optional)
 User 1───* Comment (author)
 User 1───* AuditEntry (actor)
+User 1───* Notification (recipient)
+User 1───* Notification (actor)
 Project 1───* Task
 Task 1───* Comment
+Task 1───* Notification
 ```
 
 ## User — owned by `users`
@@ -113,6 +116,48 @@ UI (clarification on audit visibility).
 | changes | JSON text | Changed fields as `{field: [old, new]}`; for `comment.deleted` the removed body. No other personal data |
 | request_id | string(64), nullable | Correlates with logs (research R12) |
 
+## Notification — owned by `notifications`
+
+A message to one user about another user's change to their work (FR-026 to FR-031, research R7).
+
+| Field | Type | Rules |
+|-------|------|-------|
+| id | integer, PK | |
+| recipient_id | FK → User.id | The task's assignee at the time of the change; never equals `actor_id` |
+| actor_id | FK → User.id | The selected user who made the change |
+| type | enum `task_assigned` \| `task_commented` \| `task_moved` | |
+| project_id | FK → Project.id | Project of the task |
+| task_id | FK → Task.id | Task the notification opens |
+| task_title | string(200) | Snapshot of the task title when created |
+| to_column | enum column, nullable | Set only for `task_moved` |
+| comment_id | integer, nullable | Set only for `task_commented`; not a foreign key (comments can be deleted) |
+| comment_preview | string(140), nullable | First 140 chars of the comment; cleared when the comment is deleted |
+| created_at | UTC datetime | |
+| read_at | UTC datetime, nullable | Null means unread |
+
+- Index `(recipient_id, created_at DESC, id DESC)` for the panel, and `(recipient_id, read_at)` for the
+  unread count.
+- Users cannot create, edit or delete notifications; they can only mark them read.
+
+### Creation rules
+
+| Trigger (owning service) | Recipient | Created when |
+|--------------------------|-----------|--------------|
+| Task created with an assignee (`tasks`) | New assignee | assignee ≠ actor |
+| Task assignee changed to a user (`tasks`) | New assignee | assignee ≠ actor |
+| Comment added (`comments`) | Task's assignee | assignee exists and ≠ actor |
+| Task moved to a different column (`tasks`) | Task's assignee | assignee exists and ≠ actor; not for same-column reorder |
+
+Not notified: clearing an assignee, title or description edits, comment edits or deletions, and
+project creation. Reassigning does not withdraw earlier notifications (spec edge case).
+
+### Lifecycle
+
+```text
+created (unread) ──mark read / open──► read
+        └──── removed automatically when more than 100 newer notifications exist for the recipient
+```
+
 ## Validation summary
 
 All rules are enforced server-side (FR-020) after trimming; whitespace-only input counts as empty.
@@ -129,4 +174,6 @@ All rules are enforced server-side (FR-020) after trimming; whitespace-only inpu
 | Position | Integer ≥ 0 | 422 |
 | Comment body | 1–2000 chars | 422 |
 | Path ids | Positive integers that exist | 404 `not_found` |
+| Notification id | Exists **and** belongs to the selected user | 404 `not_found` |
+| Notification list `limit` | Integer 1–100, default 100 | 422 |
 | Unknown request fields | Rejected | 422 |

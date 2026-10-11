@@ -1,14 +1,38 @@
 <!--
 Sync Impact Report
-- Version change: (unversioned template) → 1.0.0
-- Modified principles (template placeholder → new title):
-  - [PRINCIPLE_1_NAME] → I. Security-First (NON-NEGOTIABLE)
-  - [PRINCIPLE_2_NAME] → II. Validate All Inputs (NON-NEGOTIABLE)
-  - [PRINCIPLE_3_NAME] → III. Microservices Architecture
-  - [PRINCIPLE_4_NAME] → IV. Fully Documented Code
-  - [PRINCIPLE_5_NAME] → V. Observability & Auditability (inferred; supports I and III)
-- Added sections: Security Requirements, Development Workflow & Quality Gates, Governance
+- Version change: 2.0.0 → 2.1.0 (MINOR: new "Technology Stack" section)
+- Added sections:
+  - Technology Stack: languages, frameworks and runtime versions for backend and frontend,
+    verified on the development machine on 2026-10-11 (Node.js 24.14.0, npm 11.11.0,
+    Angular CLI 21.2.0, Python 3.12.10); upgrade rules
+- Modified principles: none
 - Removed sections: none
+- Follow-up: backend Python packages are not installed yet (they belong in the project
+  virtualenv); exact versions get pinned in backend/requirements*.txt and frontend/package-lock.json
+  when the projects are created (/speckit-tasks, /speckit-implement).
+- Deferred TODOs: none
+
+Previous amendment in this session:
+- Version change: 1.0.0 → 2.0.0 (MAJOR: Principle III redefined)
+- Modified principles:
+  - III. Microservices Architecture → III. Modular Monolith Architecture (redefined: one
+    deployable FastAPI application with strict domain boundaries replaces independently
+    deployable services)
+  - I. Security-First: "every service" wording → "every domain and component" (no rule change)
+  - II. Validate All Inputs: "inter-service messages" → "WebSocket messages and events between
+    domains" (no rule change)
+  - IV. Fully Documented Code: README and contract rules now apply to the backend application,
+    the frontend application, and each domain (adapted to the new architecture)
+  - V. Observability & Auditability: correlation ID propagated across requests, domain calls and
+    WebSocket events instead of service calls (adapted)
+- Modified sections:
+  - Security Requirements: central auth mechanism shared by all domains (was: all services)
+  - Development Workflow & Quality Gates: contract tests now between backend API and frontend
+    client, plus a domain-boundary check in review
+- Added sections: none
+- Removed sections: none
+- Follow-up: plan.md for 001-taskify-kanban-board lists the monolith as a deviation in Complexity
+  Tracking; that row can be removed on the next /speckit-plan run.
 - Deferred TODOs: none
 -->
 
@@ -18,13 +42,13 @@ Sync Impact Report
 
 ### I. Security-First (NON-NEGOTIABLE)
 
-Security is a design input, not a later review step. Every feature, service, and change MUST
+Security is a design input, not a later review step. Every feature, domain, and change MUST
 consider its threat surface before implementation begins.
 
 - Each spec and plan MUST include a security considerations section covering authentication,
   authorization, data exposure, and abuse cases.
-- Services MUST apply least privilege: every service, account, and token gets only the
-  permissions it needs.
+- Least privilege MUST apply: every component, account, and token gets only the permissions it
+  needs.
 - Default behavior MUST be deny: unauthenticated or unauthorized requests are rejected unless a
   route is explicitly declared public.
 - Secrets MUST NOT appear in source code, logs, or client-visible responses; they are loaded from
@@ -38,7 +62,7 @@ defect to fix after release.
 ### II. Validate All Inputs (NON-NEGOTIABLE)
 
 All data crossing a trust boundary MUST be validated before use. This includes user input in the
-UI, API request bodies, query and path parameters, headers, uploaded files, inter-service messages,
+UI, API request bodies, query and path parameters, headers, uploaded files, WebSocket messages,
 and data read from external systems.
 
 - Validation MUST be server-side; client-side validation is a usability aid only.
@@ -51,23 +75,28 @@ and data read from external systems.
 
 Rationale: Unvalidated input is the root cause of injection, XSS, and most data-integrity bugs.
 
-### III. Microservices Architecture
+### III. Modular Monolith Architecture
 
-Taskify is built as a set of independently deployable services, each owning one bounded
-business capability.
+Taskify's backend is one deployable Python FastAPI application, organized into domains that each
+own one bounded business capability (for example users, projects, tasks, comments, notifications,
+audit).
 
-- Each service MUST own its data store; services MUST NOT read or write another service's
-  database directly.
-- Services MUST communicate only through documented, versioned contracts (APIs or events).
-- Breaking contract changes MUST use a new version and keep the previous version available until
-  all consumers have migrated.
-- Each service MUST be independently buildable, testable, and deployable.
-- Inter-service calls MUST be authenticated; network location alone is not trust (see I).
-- A new service MUST be justified in the plan by a distinct capability; splitting purely for
-  organizational reasons is not allowed.
+- Each domain MUST own its tables, models, schemas, and service logic. Code in one domain MUST NOT
+  read or write another domain's tables directly; it MUST call that domain's service functions.
+- Domains MUST NOT import each other's ORM models or private helpers; only public service
+  functions and schemas cross domain boundaries.
+- The external API MUST be versioned (e.g., `/api/v1`). Breaking changes MUST use a new version and
+  keep the previous version available until the frontend has migrated.
+- The application MUST be buildable, testable, and deployable as a single unit; each domain MUST be
+  testable on its own through its service functions.
+- Data access MUST go through the ORM so the database engine can change by configuration.
+- A new domain MUST be justified in the plan by a distinct capability; splitting purely for
+  organizational reasons is not allowed. Extracting a domain into a separate service requires a
+  constitution amendment.
 
-Rationale: Clear service boundaries limit blast radius, both for failures and for security
-breaches, and let services evolve independently.
+Rationale: One application keeps local development, deployment, and transactions simple for a
+small team, while strict domain ownership keeps the code understandable and lets a domain be
+extracted later without a rewrite.
 
 ### IV. Fully Documented Code
 
@@ -75,33 +104,64 @@ Code MUST be understandable without asking its author.
 
 - Every public module, class, function, and API endpoint MUST have documentation describing its
   purpose, parameters, return values, errors raised, and security-relevant behavior.
-- Every service MUST have a README covering its responsibility, how to run and test it, its
-  configuration, and its dependencies.
-- Every service API MUST have a machine-readable contract (e.g., OpenAPI or an event schema) kept
-  in sync with the implementation.
+- The backend and frontend applications MUST each have a README covering responsibility, how to run
+  and test it, configuration, and dependencies; each backend domain MUST have a module docstring
+  stating what it owns.
+- The external API MUST have a machine-readable contract (e.g., OpenAPI, plus an event schema for
+  WebSocket messages) kept in sync with the implementation.
 - Non-obvious logic and any security-related decision MUST have an inline comment explaining why.
 - Significant architectural decisions MUST be recorded as decision records.
 - A change is not complete until its documentation is updated in the same change.
 
-Rationale: In a distributed system, documentation is the contract between teams and services.
+Rationale: Documentation is the contract between the backend, the frontend, and the people who
+maintain them.
 
 ### V. Observability & Auditability
 
-Every service MUST be observable enough to debug failures and investigate security events.
+The application MUST be observable enough to debug failures and investigate security events.
 
-- Services MUST emit structured logs with a correlation ID propagated across service calls.
+- The backend MUST emit structured logs with a correlation ID that follows each request through
+  domain calls and into the WebSocket events it causes.
 - Security-relevant events (sign-in, permission changes, access denials, validation failures)
   MUST be written to an audit log.
 - Logs MUST NOT contain secrets, credentials, or unmasked personal data.
-- Each service MUST expose health checks and basic metrics.
+- The backend MUST expose health checks and basic metrics.
 
-Rationale: Without tracing and audit trails, incidents across many services cannot be diagnosed
-or proven.
+Rationale: Without tracing and audit trails, incidents cannot be diagnosed or proven.
+
+## Technology Stack
+
+These are the decided languages, frameworks and runtimes. Versions marked "verified" were confirmed
+on the development machine on 2026-10-11.
+
+| Area | Choice | Version rule |
+|------|--------|--------------|
+| Backend language | Python | 3.12.x (verified 3.12.10) |
+| Backend framework | FastAPI on Uvicorn, Pydantic v2, pydantic-settings | Latest stable at project creation, Pydantic 2.x only |
+| Data access | SQLAlchemy 2.x (async) with aiosqlite; Alembic migrations | SQLAlchemy 2.x only |
+| Database | SQLite in WAL mode; PostgreSQL-compatible through the ORM | SQLite bundled with Python 3.12 |
+| Backend tests | pytest, pytest-asyncio, httpx | Latest stable at project creation |
+| Frontend language | TypeScript in strict mode | ~5.9 (the version Angular CLI 21.2 scaffolds) |
+| Frontend framework | Angular, standalone components, signals, zoneless change detection | 21.x (verified Angular CLI 21.2.0) |
+| Frontend libraries | Angular CDK (DragDrop, Menu, Dialog), RxJS | CDK matching the Angular minor; RxJS ~7.8 |
+| Frontend tests | Angular's default unit test runner (Vitest) | As scaffolded by Angular CLI 21 |
+| JavaScript runtime | Node.js | 24.x LTS (verified 24.14.0; Angular 21 supports ^20.19, ^22.12, >=24) |
+| Package managers | npm for the frontend; pip with a virtualenv for the backend | npm 11.x (verified 11.11.0) |
+| Containers | None in this phase; everything runs locally | — |
+
+- Exact versions MUST be pinned: `frontend/package-lock.json` and `backend/requirements.txt` (plus
+  `requirements-dev.txt`) are committed.
+- The required runtimes MUST be declared in the repository (`.nvmrc` with `24`,
+  `.python-version` with `3.12`, and `engines` in `frontend/package.json`) so tools and reviewers
+  can check them.
+- Patch and minor upgrades within the rules above MAY be made through the lock files after tests
+  pass. A major-version change of any item in this table, or adding a new framework, MUST be
+  recorded as a decision record and requires a MINOR amendment of this constitution.
 
 ## Security Requirements
 
 - Authentication and authorization MUST use a single, centrally defined mechanism shared by all
-  services; services MUST NOT implement their own credential handling.
+  domains; domains MUST NOT implement their own credential handling.
 - All traffic MUST be encrypted in transit (TLS); sensitive data MUST be encrypted at rest.
 - Passwords, if stored, MUST be hashed with a modern adaptive algorithm (e.g., Argon2 or bcrypt).
 - Public endpoints MUST apply rate limiting.
@@ -111,12 +171,14 @@ or proven.
 ## Development Workflow & Quality Gates
 
 - Every change MUST go through code review; reviewers MUST confirm compliance with this
-  constitution, with explicit attention to Principles I and II.
+  constitution, with explicit attention to Principles I and II and to domain boundaries
+  (Principle III).
 - CI MUST pass before merge: build, tests (including input-validation tests), linting,
   documentation checks, and dependency vulnerability scanning.
 - The plan for each feature MUST include a Constitution Check that lists any deviation and its
   justification; unjustified deviations block the plan.
-- Contract changes between services MUST include contract tests for both provider and consumer.
+- API contract changes MUST include contract tests on both sides: the backend's published
+  contract and the frontend client generated from it.
 
 ## Governance
 
@@ -131,4 +193,4 @@ it, the constitution wins.
   Complexity or deviation MUST be justified in the plan. Compliance is reviewed whenever the
   constitution is amended.
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-11 | **Last Amended**: 2026-10-11
+**Version**: 2.1.0 | **Ratified**: 2026-10-11 | **Last Amended**: 2026-10-11

@@ -58,13 +58,15 @@ Expected: all tests pass, including the OpenAPI drift test (research R10).
 
 ## 4. End-to-end validation scenarios
 
-Open two browser windows at `http://localhost:4200` to watch real-time updates.
+Open two browser windows at `http://localhost:4200` to watch live updates and notifications. Each
+tab keeps its own selected user, so two tabs can act as two different users; open the second one
+fresh rather than duplicating a tab, which copies the selection.
 
 | # | Scenario | Steps | Expected | Covers |
 |---|----------|-------|----------|--------|
 | 1 | Pick a user | Open the app | Five users, no password; choose Sam Lee → project list with 3 projects | US1-1, US1-2, FR-001, FR-002 |
 | 2 | Board and my tasks | Open Customer Portal | Four columns in order; Sam Lee's cards have the "You" chip | US1-3, US1-5, FR-014 |
-| 3 | Drag and persist | Drag a To Do card to In Review; reload | Card stays in In Review; the second window updated without reload | US1-4, FR-013, FR-015, SC-003 |
+| 3 | Drag and persist | Drag a To Do card to In Review; reload | Card stays in In Review; the second window updated within 2 s without reload | US1-4, FR-013, FR-015, SC-003 |
 | 4 | Keyboard move | Tab to a card, open "Move to", choose Done | Card moves to the bottom of Done | FR-013, FR-025 |
 | 5 | Selection persistence | Reload, then close the tab and reopen | Reload keeps Sam Lee; new tab shows user selection | FR-002 clarification |
 | 6 | Switch user | Click "Switch user", pick Riley Chen | Riley's cards now show "You" | US1-6, FR-003 |
@@ -80,6 +82,15 @@ Open two browser windows at `http://localhost:4200` to watch real-time updates.
 | 16 | Audit trail | After the steps above, inspect `audit_entries` in `taskify.db` | One entry per change with actor and time; none for no-op moves | FR-023 |
 | 17 | Large board | Run the 200-task load test (`pytest -m perf`) | Board load < 3 s; move reflected < 1 s | SC-007 |
 | 18 | Keyboard and contrast | Navigate every screen with keyboard only; run an accessibility checker | All actions reachable; no AA contrast failures | FR-025 |
+| 19 | Assignment notification | Window A as Alex Morgan, window B as Sam Lee. Alex assigns a task to Sam | Sam's bell count rises within 2 s without reload; panel shows "Alex Morgan assigned you …" | US5-1, FR-026, FR-029, SC-009 |
+| 20 | Comment and move notifications | Alex comments on, then moves, a task assigned to Sam | Two more unread notifications for Sam, with comment preview and "to <column>" | US5-1, FR-026 |
+| 21 | No self-notifications | As Sam, assign a task to yourself, comment on it, move it | Sam's unread count does not change | US5-2, SC-010 |
+| 22 | Open and mark read | As Sam, open the panel, select a notification; then "Mark all as read" | Lands on the task, row becomes read; count goes to 0 and the badge disappears in every Sam tab | US5-3, US5-4, FR-028 |
+| 23 | Offline delivery | Close Sam's window; Alex assigns another task; reopen and pick Sam | The new notification is listed as unread | US5-5, FR-029 |
+| 24 | Recipient only | `GET /api/v1/notifications` with `X-Taskify-User: <Jordan's id>`; `POST /api/v1/notifications/<Sam's id>/read` as Jordan | Jordan sees only Jordan's list; the POST returns `404 not_found` | FR-031, SC-010 |
+| 25 | Deleted comment preview | Alex comments on Sam's task, then deletes the comment | Sam's notification remains and opens the task; no comment text is shown | Edge cases |
+| 26 | Retention | Run `pytest -k notification_retention` (creates 105 notifications for one user) | Exactly the newest 100 remain | FR-030 |
+| 27 | Empty panel | Pick a user with no notifications and open the bell | "You're all caught up"; "Mark all as read" disabled | Edge cases, design `notifications-empty` |
 
 ## 5. Reset local data
 

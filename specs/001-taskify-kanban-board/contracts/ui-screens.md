@@ -8,17 +8,21 @@ One contract per designed screen. Paths are under `frontend/src/app/`. Every rou
 stored in `sessionStorage` or `GET /users/me` returns 401 (FR-005).
 
 The Stitch designs are visual references. Elements they added that the spec excludes (search,
-notifications, analytics tabs, tags, ticket ids, due dates, checklists, sprint badge, team "+",
-column "+"/"…" menus, realtime footer) are **not** part of any contract below.
+analytics tabs, tags, ticket ids, due dates, checklists, sprint badge, team "+", column "+"/"…"
+menus, realtime footer) are **not** part of any contract below. The notification bell **is** in
+scope (US5).
 
 ## Global layout and behavior
 
 - **Top navigation bar** (`shared/ui/top-nav`): Taskify wordmark (link to `/projects`), breadcrumb,
-  current user chip (avatar, name, role) and a "Switch user" button that clears the selection and
-  navigates to `/select-user` (FR-003). Shown on every screen except user selection.
+  notification bell (see `notifications-panel`), current user chip (avatar, name, role) and a
+  "Switch user" button that clears the selection, closes the WebSocket and navigates to
+  `/select-user` (FR-003). Shown on every screen except user selection. Visual reference: the nav
+  bar in `design/screens/projects/screen.html`, the only export with the final layout.
 - **Background**: `shared/ui/aurora-background` behind all routes.
 - **Realtime**: `RealtimeService` connects after a user is selected and feeds `ProjectsStore`,
-  `BoardStore` and `CommentsStore`.
+  `BoardStore`, `CommentsStore` and `NotificationsStore`. On reconnect it reloads all four over
+  REST.
 - **Errors**: 401 anywhere → clear selection, go to `/select-user`. 404 → "not found" toast and
   refresh of the current view. 500 → toast "Something went wrong. Try again." with no details.
 - **Accessibility (FR-025)**: WCAG 2.1 AA; every action keyboard-operable; visible teal focus ring;
@@ -41,7 +45,8 @@ column "+"/"…" menus, realtime footer) are **not** part of any contract below.
 
 ## projects — Project list
 
-- **Design**: `design/screens/projects/screen.html` (exported image is empty; use the HTML)
+- **Design**: `design/screens/projects/screen.html` (exported image is empty; use the HTML;
+  previous export in `variants/1`)
 - **Route**: `/projects`
 - **Component**: `features/projects/projects.page.ts`, `features/projects/project-card/`
 - **Inputs**: selected user
@@ -76,7 +81,7 @@ column "+"/"…" menus, realtime footer) are **not** part of any contract below.
 ## board — Project board
 
 - **Design**: `design/screens/board/screen.html`, `screen.png`; variants: `variants/1` (long title
-  clamp), `variants/2` (1024px horizontal scroll)
+  clamp), `variants/2` (1024px horizontal scroll), `variants/3` (previous export of variant 1)
 - **Route**: `/projects/:projectId`
 - **Components**: `features/board/board.page.ts`, `board-column/`, `task-card/`, `move-menu/`
 - **Inputs**: `projectId` route param, selected user
@@ -170,12 +175,47 @@ column "+"/"…" menus, realtime footer) are **not** part of any contract below.
     comments
   - Markup in comments renders as plain text
 
+## notifications-panel — Notification panel
+
+- **Design**: `design/screens/notifications-panel/screen.html`, `screen.png`
+- **Entry**: bell button in the top navigation bar, on every screen that shows the bar; not a route
+- **Components**: `shared/ui/top-nav/notification-bell/`,
+  `features/notifications/notification-panel/notification-panel.component.ts`,
+  `features/notifications/notification-item/`, state in `core/state/notifications.store.ts`
+- **Inputs**: selected user
+- **Data**: `GET /notifications` on user selection and after reconnect → unread count on the bell
+  badge (hidden at 0, "99+" above 99) and the list, newest first. Each row: actor avatar, sentence
+  ("assigned you", "commented on", "moved … to <column>"), task title, comment preview for comments,
+  project name, relative time, event icon, unread dot.
+- **Actions**:
+  - Open/close the panel (click, Enter/Space on the bell; Escape or click outside closes and returns
+    focus to the bell)
+  - Select a notification → `POST /notifications/:id/read`, close the panel, navigate to
+    `/projects/:projectId/tasks/:taskId`
+  - "Mark all as read" → `POST /notifications/read-all`
+- **Realtime**: `notification.created` increments the badge and inserts the row if the panel is open;
+  `notifications.read` syncs other tabs. No pop-up toast.
+- **States**: unread and read rows; loading (three skeleton rows); load error (inline message with
+  retry); task no longer reachable (404 on open → not-found toast); empty → `notifications-empty`
+- **Accessibility**: bell has `aria-label="Notifications, N unread"` and `aria-expanded`; the panel
+  is a labelled dialog-like popover with arrow-key navigation between rows; the unread state is
+  announced in text ("Unread"), not only by the dot.
+
+## notifications-empty — No notifications
+
+- **Design**: `design/screens/notifications-empty/screen.html`, `screen.png`
+- **Entry**: `notifications-panel` when the list is empty
+- **Behavior**: no badge on the bell; "Mark all as read" disabled; empty state "You're all caught
+  up" with the secondary line "We'll let you know when someone assigns, comments on or moves your
+  tasks."
+
 ## not-found-toast — Not found message
 
 - **Design**: `design/screens/not-found-toast/screen.html`, `screen.png`
 - **Component**: `shared/ui/toast/` via `ToastService`
-- **Triggers**: any `404 not_found` from a user action; a `comment.deleted` event for a comment being
-  edited; a stale or edited task/project link
+- **Triggers**: any `404 not_found` from a user action (including opening a notification whose task
+  can't be loaded); a `comment.deleted` event for a comment being edited; a stale or edited
+  task/project link
 - **Behavior**: amber-edged glass toast in the bottom right with title and message, close button,
   auto-dismiss after 6 s, announced through an `aria-live="polite"` region; the affected view
   reloads

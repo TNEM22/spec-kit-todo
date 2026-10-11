@@ -16,7 +16,7 @@ machine-readable form of this contract. The committed copy at
 - **Columns**: `todo`, `in_progress`, `in_review`, `done`.
 - **Strings** are trimmed server-side; unknown body fields are rejected.
 - **Not provided in this phase**: delete or update of projects, delete of tasks, any user
-  mutation, notifications, audit log access.
+  mutation, deleting notifications, audit log access.
 
 ### Error envelope
 
@@ -51,6 +51,10 @@ TaskOut       { id, project_id, title, description|null, column, position,
 BoardOut      { project: ProjectOut,
                 columns: { todo: TaskOut[], in_progress: TaskOut[], in_review: TaskOut[], done: TaskOut[] } }
 CommentOut    { id, task_id, author: UserOut, body, created_at, edited_at|null }
+NotificationOut { id, type: "task_assigned"|"task_commented"|"task_moved", actor: UserOut,
+                  project: { id, name }, task_id, task_title, to_column|null,
+                  comment_preview|null, created_at, read: bool }
+NotificationList { items: NotificationOut[], unread_count: int }
 ```
 
 ## Endpoints
@@ -100,6 +104,20 @@ no event. The response reflects final placement after renumbering.
 | PATCH | `/comments/{comment_id}` | `{ body: 1–2000 }` | `200 CommentOut` with `edited_at` set; `403`, `404`, `422` |
 | DELETE | `/comments/{comment_id}` | — | `204`; `403`, `404` |
 
+### Notifications (FR-026 to FR-031)
+
+All notification endpoints act only on the selected user's notifications. A notification id that
+does not exist **or belongs to another user** returns `404 not_found`.
+
+| Method | Path | Body | Response |
+|--------|------|------|----------|
+| GET | `/notifications?limit=1..100` | — | `200 NotificationList`, newest first; `limit` defaults to 100 |
+| POST | `/notifications/{notification_id}/read` | — | `200 NotificationOut` with `read: true` (idempotent); `404` |
+| POST | `/notifications/read-all` | — | `200 { "unread_count": 0 }` |
+
+Notifications are created only as a side effect of task and comment changes (see data-model
+"Creation rules"); there is no endpoint to create, edit or delete them.
+
 ### Real-time
 
 | Method | Path | Contract |
@@ -112,6 +130,9 @@ Every successful mutation (POST, PATCH, move, DELETE) in one transaction:
 
 1. applies the change,
 2. writes an `AuditEntry` (data-model) with the selected user as actor,
-3. after commit, publishes the matching WebSocket event.
+3. creates any notifications the change triggers and trims each recipient to 100,
+4. after commit, publishes the matching board event to everyone and each `notification.created`
+   event to its recipient only.
 
-A failed request changes nothing (FR-020).
+A failed request changes nothing (FR-020). Marking notifications read changes only `read_at` and
+publishes `notifications.read` to the same user's other connections; it writes no audit entry.

@@ -8,9 +8,10 @@
 
 Taskify phase 1 is a local web app where one of five predefined users (no login) picks an identity,
 browses projects, and moves tasks across a fixed four-column Kanban board, with task creation,
-assignment and author-only comments. The backend is a FastAPI modular monolith over SQLite (async
-SQLAlchemy, Alembic, WAL) exposing a versioned REST API at `/api/v1` plus a WebSocket that pushes
-every change to open boards. The frontend is an Angular 21 standalone, signal-based app using CDK
+assignment, author-only comments, and in-app notifications when someone else assigns, comments on
+or moves your task. The backend is a FastAPI modular monolith over SQLite (async SQLAlchemy,
+Alembic, WAL) exposing a versioned REST API at `/api/v1` plus one WebSocket that pushes every
+change to open boards and each notification to its recipient only. The frontend is an Angular 21 standalone, signal-based app using CDK
 DragDrop, a client generated from the OpenAPI schema, and the dark "fluid glass" design imported
 from Google Stitch.
 
@@ -34,13 +35,14 @@ Angular dev server on `localhost:4200`; desktop browsers
 **Project Type**: Web application (backend API + frontend SPA)
 
 **Performance Goals**: board with 200 tasks loads < 3 s; a move shows in its new position < 1 s for
-the mover and is pushed to other open boards over WebSocket (SC-003, SC-007)
+the mover and < 2 s on other open boards; a notification reaches its online recipient < 2 s
+(SC-003, SC-007, SC-009)
 
 **Constraints**: no Docker; single Uvicorn worker (in-process WebSocket broadcast); bound to
 localhost; WCAG 2.1 AA; no authentication in this phase
 
-**Scale/Scope**: 5 users, 3 seeded projects plus user-created ones, up to ~200 tasks per project;
-13 designed screens/states; ~15 REST endpoints and 1 WebSocket
+**Scale/Scope**: 5 users, 3 seeded projects plus user-created ones, up to ~200 tasks per project,
+up to 100 notifications per user; 15 designed screens/states; ~18 REST endpoints and 1 WebSocket
 
 ## Constitution Check
 
@@ -60,7 +62,8 @@ Constitution v1.0.0 ([.specify/memory/constitution.md](../../.specify/memory/con
 | II. Reject, don't coerce; non-leaking errors | ✅ Pass | One error envelope; 422 with field messages; 500 generic (research R8) |
 | II. Output encoding, parameterized queries | ✅ Pass | Angular interpolation only, `innerHTML` banned by lint; ORM only, no raw SQL |
 | II. Validation tests with malicious input | ✅ Pass | Planned per field (research R11) |
-| III. Each service owns its data; versioned contracts | ⚠️ Deviation | Modular monolith with per-domain table ownership; REST contract versioned `/api/v1`; see Complexity Tracking |
+| III. Each service owns its data; versioned contracts | ⚠️ Deviation | Modular monolith (now also a spec clarification) with per-domain table ownership, including the new `notifications` domain; REST contract versioned `/api/v1`; see Complexity Tracking |
+| I/II. Notification privacy and input | ✅ Pass | Every notification query filters by the selected user; others' ids return 404; notification text rendered as plain text (research R7) |
 | III. Inter-service calls authenticated | N/A | No inter-service network calls in a single process |
 | IV. Public code documented | ✅ Pass | Docstrings on public functions, routers and schemas; TSDoc on exported Angular APIs; enforced in review |
 | IV. README per service, machine-readable contract | ✅ Pass | `backend/README.md`, `frontend/README.md`; OpenAPI generated and committed with drift test |
@@ -78,9 +81,14 @@ Constitution v1.0.0 ([.specify/memory/constitution.md](../../.specify/memory/con
 **Gate result (pre-research)**: PASS with justified deviations listed in Complexity Tracking.
 
 **Gate result (post-design re-check)**: PASS. The data model, contracts and UI plan introduce no new
-deviations. Two items were tightened during design: the WebSocket handshake now checks `Origin`
-and the user id (contracts/websocket.md), and seed data was kept out of migrations so PostgreSQL
-migration stays clean (research R4).
+deviations. Items tightened during design: the WebSocket handshake checks `Origin` and the user id,
+notification events are delivered only to the recipient's sockets (contracts/websocket.md),
+notifications are written in the same transaction as their triggering change so none are lost
+(research R7), and seed data was kept out of migrations so PostgreSQL migration stays clean
+(research R4).
+
+**Plan revision 2026-10-11**: updated for the spec clarifications that added notifications (US5,
+FR-026 to FR-031), made live updates a requirement (FR-015), and recorded the monolith decision.
 
 ## Project Structure
 
@@ -135,6 +143,7 @@ backend/
 │   │   ├── project.py
 │   │   ├── task.py
 │   │   ├── comment.py
+│   │   ├── notification.py
 │   │   └── audit.py
 │   ├── schemas/                   # Pydantic request/response models
 │   │   ├── common.py              # error envelope, base config (extra="forbid")
@@ -142,23 +151,26 @@ backend/
 │   │   ├── project.py
 │   │   ├── task.py
 │   │   ├── comment.py
+│   │   ├── notification.py
 │   │   └── events.py              # WebSocket event envelopes
 │   ├── services/                  # domain logic; each touches only its own models
 │   │   ├── users.py
 │   │   ├── projects.py
 │   │   ├── tasks.py               # create, update, move/renumber, board composition
 │   │   ├── comments.py            # author-only edit/delete
+│   │   ├── notifications.py       # trigger rules, 100-per-user trim, list, mark read
 │   │   ├── audit.py
-│   │   └── events.py              # publish-after-commit to realtime
+│   │   └── events.py              # publish-after-commit to realtime (broadcast or per user)
 │   ├── routers/                   # /api/v1 routes
 │   │   ├── health.py
 │   │   ├── users.py
 │   │   ├── projects.py
 │   │   ├── tasks.py
 │   │   ├── comments.py
+│   │   ├── notifications.py
 │   │   └── ws.py                  # WebSocket endpoint
 │   ├── realtime/
-│   │   └── manager.py             # ConnectionManager, broadcast, heartbeat
+│   │   └── manager.py             # ConnectionManager: sockets by user, broadcast, send_to_user, heartbeat
 │   ├── seed/
 │   │   ├── __main__.py            # python -m app.seed
 │   │   └── sample_data.py         # 5 users, 3 projects, sample tasks/comments
@@ -204,10 +216,12 @@ frontend/
         │   └── state/
         │       ├── projects.store.ts
         │       ├── board.store.ts
-        │       └── comments.store.ts
+        │       ├── comments.store.ts
+        │       └── notifications.store.ts
         ├── shared/ui/
         │   ├── aurora-background/
         │   ├── top-nav/
+        │   │   └── notification-bell/ # bell button + unread badge, opens the panel
         │   ├── avatar/
         │   ├── you-chip/
         │   ├── status-chip/
@@ -232,11 +246,14 @@ frontend/
             │   ├── task-card/
             │   ├── move-menu/
             │   └── task-create/task-create.dialog.ts
-            └── task-detail/
-                ├── task-detail.drawer.ts
-                ├── comment-list/
-                ├── comment-item/
-                └── comment-composer/
+            ├── task-detail/
+            │   ├── task-detail.drawer.ts
+            │   ├── comment-list/
+            │   ├── comment-item/
+            │   └── comment-composer/
+            └── notifications/
+                ├── notification-panel/notification-panel.component.ts
+                └── notification-item/
 
 docs/
 └── adr/                           # decision records carried over from research.md
@@ -251,7 +268,7 @@ defaults.
 ## UI Design Implementation
 
 **Design source**: [design/manifest.md](design/manifest.md), [design/tokens.md](design/tokens.md),
-[design-prompt.md](design-prompt.md). Status check: no `frontend/` code exists yet, so all 13
+[design-prompt.md](design-prompt.md). Status check: no `frontend/` code exists yet, so all 15
 `generated` designs are unimplemented and none were marked `implemented`.
 
 ### Design tokens plan (shared setup, done once)
@@ -271,6 +288,12 @@ defaults.
 - Contrast: columns use `white/0.04` in the export; raise text-bearing lanes to at least the value
   that keeps `--tf-text-2` at 4.5:1 and verify with an accessibility checker (FR-025).
 - Icons: Material Symbols Outlined (weight 300), as in the export.
+- Notification tokens (tokens.md "Notifications"): `--tf-badge` (teal fill, dark text, glow),
+  `--tf-unread-dot`, `--tf-panel-shadow` (heavier overlay shadow with faint teal glow), and a
+  `.glass-panel-popover` class at 400px width (`calc(100vw - 1.5rem)` on narrow windows).
+- Navigation bar reference: the nav in `design/screens/projects/screen.html` (wordmark,
+  breadcrumb, bell, user chip, "Switch user"); other exports still show the out-of-scope search
+  and tabs.
 
 ### Shared components
 
@@ -290,14 +313,15 @@ defaults.
 | Empty state | `frontend/src/app/shared/ui/empty-state/` | board-empty, projects, task-detail |
 | Toast + service | `frontend/src/app/shared/ui/toast/` | not-found-toast, all API errors |
 | Task card | `frontend/src/app/features/board/task-card/` | board, board-loading, card-move-menu, not-found-toast |
+| Notification bell + badge | `frontend/src/app/shared/ui/top-nav/notification-bell/` | Every screen with the top navigation bar; opens notifications-panel / notifications-empty |
 
 ### Screen implementation table
 
 | Slug | Screen | User Story | Design Reference | Frontend Target (page/component paths) | Shared Components Used | States to Build | Data/Contract Dependencies |
 |------|--------|------------|------------------|----------------------------------------|------------------------|-----------------|----------------------------|
-| board | Project board | US1 (P1) | `design/screens/board/screen.html`, `screen.png`, `variants/1`, `variants/2` | `features/board/board.page.ts`, `board-column/`, `task-card/` | top-nav, glass-panel, avatar, you-chip, status-chip, task-card | default, mid-drag + drop zone, my-task highlight, long-title clamp, 1024px scroll, project not found | Project, Task, User; `GET /projects/{id}/board`, `POST /tasks/{id}/move`; `task.*` events |
+| board | Project board | US1 (P1) | `design/screens/board/screen.html`, `screen.png`, `variants/1`–`3` | `features/board/board.page.ts`, `board-column/`, `task-card/` | top-nav, glass-panel, avatar, you-chip, status-chip, task-card | default, mid-drag + drop zone, my-task highlight, long-title clamp, 1024px scroll, project not found | Project, Task, User; `GET /projects/{id}/board`, `POST /tasks/{id}/move`; `task.*` events |
 | user-select | User selection | US1 (P1) | `design/screens/user-select/screen.html`, `screen.png` | `features/user-select/user-select.page.ts` | aurora-background, glass-panel, avatar, skeleton | loading, error + retry, focus/hover | User; `GET /users`, `GET /users/me` |
-| projects | Project list | US1 (P1), US4 (P4) | `design/screens/projects/screen.html` (image empty) | `features/projects/projects.page.ts`, `project-card/` | top-nav, glass-panel, avatar, skeleton, empty-state | loading, empty, error, hover | Project (summary counts); `GET /projects`; `project.created`, `task.*` events |
+| projects | Project list | US1 (P1), US4 (P4) | `design/screens/projects/screen.html` (image empty; nav reference), `variants/1` | `features/projects/projects.page.ts`, `project-card/` | top-nav, glass-panel, avatar, skeleton, empty-state | loading, empty, error, hover | Project (summary counts); `GET /projects`; `project.created`, `task.*` events |
 | task-create | New task modal | US2 (P2) | `design/screens/task-create/screen.html`, `screen.png` | `features/board/task-create/task-create.dialog.ts` | modal-shell, text-field, avatar | idle, submitting, assignee dropdown open | Task, User; `POST /projects/{id}/tasks`, `GET /users` |
 | task-create-error | New task validation error | US2 (P2) | `design/screens/task-create-error/screen.html`, `screen.png` | `features/board/task-create/task-create.dialog.ts` | modal-shell, text-field, form-alert | empty/whitespace title, over-length fields, server 422 | Error envelope (contracts/rest-api.md) |
 | task-detail | Task detail drawer | US2 (P2), US3 (P3) | `design/screens/task-detail/screen.html`, `screen.png` | `features/task-detail/task-detail.drawer.ts`, `comment-list/`, `comment-item/`, `comment-composer/` | drawer-shell, avatar, you-chip, status-chip, text-field, skeleton, empty-state | loading, no comments, composer error, inline edit, task not found | Task, Comment, User; `GET/PATCH /tasks/{id}`, `POST /tasks/{id}/move`, `GET/POST /tasks/{id}/comments`; `task.*`, `comment.*` events |
@@ -308,6 +332,8 @@ defaults.
 | project-create | New project modal | US4 (P4) | `design/screens/project-create/screen.html`, `screen.png` | `features/projects/project-create/project-create.dialog.ts` | modal-shell, text-field, status-chip | idle, submitting | Project; `POST /projects` |
 | project-create-error | New project duplicate name | US4 (P4) | `design/screens/project-create-error/screen.html`, `screen.png` | `features/projects/project-create/project-create.dialog.ts` | modal-shell, text-field, form-alert | 409 duplicate, 422 fields | Error envelope |
 | board-empty | Empty board | US4 (P4) | `design/screens/board-empty/screen.html` (image empty) | `features/board/board.page.ts` (empty branch) | empty-state, glass-panel, top-nav | empty | `GET /projects/{id}/board` with no tasks |
+| notifications-panel | Notification panel | US5 (P5) | `design/screens/notifications-panel/screen.html`, `screen.png` | `features/notifications/notification-panel/notification-panel.component.ts`, `features/notifications/notification-item/`, `shared/ui/top-nav/notification-bell/` | top-nav, notification-bell, avatar, status-chip, glass-panel, skeleton | unread/read rows, badge count incl. "99+", live insert, loading, error + retry, 404 on open | Notification, User, Project; `GET /notifications`, `POST /notifications/{id}/read`, `POST /notifications/read-all`; `notification.created`, `notifications.read` events |
+| notifications-empty | No notifications | US5 (P5) | `design/screens/notifications-empty/screen.html`, `screen.png` | `features/notifications/notification-panel/` (empty branch) | empty-state, notification-bell | empty, "Mark all as read" disabled, no badge | `GET /notifications` returning no items |
 
 Paths in the table are relative to `frontend/src/app/`.
 
@@ -317,7 +343,7 @@ None.
 
 ### Pending designs
 
-None. All 13 manifest rows are `generated`.
+None. All 15 manifest rows are `generated`.
 
 ### Implementation rules
 
@@ -337,12 +363,13 @@ None. All 13 manifest rows are `generated`.
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
 | No authentication (Principle I; Security Req. central auth) | Spec phase 1 decision: predefined users, no login; identity choice only | Adding login contradicts the spec scope. Mitigated by deny-by-default `X-Taskify-User` check, audit log, localhost-only binding |
-| Modular monolith instead of microservices (Principle III) | User-specified single FastAPI backend, local install, no Docker | Separate services would need process orchestration and inter-service auth with no benefit at 5 users; per-domain table ownership keeps later extraction possible (research R1) |
+| Modular monolith instead of microservices (Principle III) | User-specified single FastAPI backend, local install, no Docker; confirmed in the spec clarifications | Separate services would need process orchestration and inter-service auth with no benefit at 5 users; per-domain table ownership keeps later extraction possible (research R1). Remove this row once Principle III is amended via `/speckit-constitution` |
 | No TLS (Security Req.) | Server bound to 127.0.0.1 for local development only | Local certificates add setup cost with no attacker on the loopback interface; required before any network exposure |
 | No rate limiting (Security Req.) | No public endpoints; localhost only | A limiter protects nothing locally; must be added together with authentication before exposure |
 
 ## Out of Scope for This Plan
 
-- **Notifications**: requested in the plan input but excluded by the spec (research R7). Update the
-  spec first if they are needed.
-- Project and task deletion, user management, audit log screen, mobile layouts (spec Assumptions).
+- Email or push notifications, notification settings, pop-up notification toasts, deleting
+  notifications (spec Assumptions; in-app notifications are planned, research R7).
+- Project and task deletion, user management, audit log screen, presence indicators, mobile layouts
+  (spec Assumptions).
