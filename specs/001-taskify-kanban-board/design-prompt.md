@@ -13,6 +13,11 @@
 5. When you are happy with the result, download all frames as a .zip, place it in this folder, and
    run `/speckit-design-import`.
 
+**Update 2026-10-11 (notifications)**: Prompts 1–6, S1–S7 and refinements 1–8 are already designed
+and imported. Only paste the new items, in your existing Stitch project so the style carries over:
+**Prompt 7**, **S8**, then **refinement 9**. Export them as a new .zip and run
+`/speckit-design-import`.
+
 ## Design System
 
 Requested direction: eye-catching yet soothing, fluid glass effect, dark mode only (no light theme).
@@ -53,6 +58,7 @@ Requested direction: eye-catching yet soothing, fluid glass effect, dark mode on
 | 4 | New task modal | Create a task with title, description, assignee | US2 | P2 |
 | 5 | Task detail drawer | Edit task, assign, change column, read and add comments | US2, US3 | P2 |
 | 6 | New project modal | Create a project with name and description | US4 | P4 |
+| 7 | Notification panel | Bell with unread count; list of my notifications | US5 | P5 |
 
 ## Prompt 1 — App overview + Project board
 
@@ -148,6 +154,24 @@ Below the fields, a small preview row showing four mini column chips that the ne
 Footer, right-aligned: ghost "Cancel" button and teal #5EEAD4 pill primary button "Create project" with dark #0B1020 text. The name field shows the focused state with a 2px teal ring and soft glow.
 ```
 
+## Prompt 7 — Notification panel
+
+```text
+Using the same dark fluid-glass design system as the board screen (midnight #0B1020 background with blurred teal, indigo and violet aurora, frosted glass surfaces, teal accent #5EEAD4, text #E6E9F2 and #A3ACC2, Plus Jakarta Sans), design the notification panel opened from the Customer Portal board. The board stays visible behind it, slightly dimmed.
+
+In the top navigation bar, just left of the user chip "Sam Lee · Engineer", show a round glass bell icon button in its active state with a small teal #5EEAD4 badge reading "3" (dark #0B1020 text).
+
+Below the bell, a glass dropdown panel about 400px wide, 24px radius, anchored to the top right. Header row: the title "Notifications", a small "3 unread" chip, and a lavender #A5B4FC text button "Mark all as read".
+
+A list of notifications, newest first. Each row has the actor's avatar, one line of text, the task title in semibold, the project name and time in secondary text, and an event icon (person-plus for assigned, speech bubble for comment, arrow for moved). Unread rows have slightly brighter glass and a small teal dot on the right; read rows are dimmer with no dot.
+Unread: Alex Morgan (avatar #C4B5FD) "assigned you" "Build account settings page" · Customer Portal · 2 min ago.
+Unread: Riley Chen (avatar #FDBA74) "commented on" "Refactor search filters": a one-line preview "Looks good, one small naming nit." · Customer Portal · 15 min ago.
+Unread: Jordan Patel (avatar #F9A8D4) "moved" "Refactor search filters" "to In Review" with a small amber #FCD34D status dot · Customer Portal · 1 h ago.
+Read: Taylor Brooks (avatar #93C5FD) "assigned you" "Rotate invoice PDF fonts" · Billing Revamp · Yesterday.
+
+Show the first row in a hover/focus state with a 2px teal focus ring. No settings icon, no delete buttons, no email options.
+```
+
 ## State Prompts
 
 ### S1 — Empty board (new project)
@@ -202,6 +226,12 @@ Using the same dark fluid-glass design system, show the Customer Portal board wh
 Using the same dark fluid-glass design system, show the Customer Portal board with the card "Write release notes" (To Do, Taylor Brooks) focused by keyboard: a 2px teal #5EEAD4 focus ring with soft glow. A small "more" icon button on the card is active and opens a glass context menu titled "Move to" listing In Progress (sky #7DD3FC dot), In Review (amber #FCD34D dot) and Done (mint #86EFAC dot); To Do is shown with a check and labelled "Current". The "In Review" item is highlighted. Show a keyboard hint at the bottom of the menu: "↑ ↓ to choose · Enter to move".
 ```
 
+### S8 — No notifications
+
+```text
+Using the same dark fluid-glass design system, show the notification panel from the previous screen with no notifications. The bell button in the navigation bar has no badge. The glass panel header shows "Notifications" with the "Mark all as read" button disabled and dimmed. The body shows a calm, centered empty state: a soft glowing line illustration of a bell with a small check mark, the text "You're all caught up", and the secondary text "We'll let you know when someone assigns, comments on or moves your tasks." Keep the panel compact.
+```
+
 ## Refinement Prompts
 
 ```text
@@ -236,6 +266,10 @@ Make the background aurora softer and slower-feeling on all screens: reduce each
 Make the navigation bar identical on the board, project list and empty board screens: same height, same wordmark size, same user chip and "Switch user" button position.
 ```
 
+```text
+Make the navigation bar identical on every screen that has it: add the round glass bell button with its teal unread badge immediately left of the user chip, and remove any other icons (search, settings, filters) from the bar.
+```
+
 ## Out of Scope (do not design)
 
 - Login, sign-up, password, or "forgot password" screens.
@@ -244,7 +278,9 @@ Make the navigation bar identical on the board, project list and empty board scr
 - Deleting projects or tasks (only comments can be deleted).
 - Adding, renaming, removing, or reordering columns.
 - An audit log screen (maintainers only in this phase).
-- Notifications, due dates, labels, attachments, search, file uploads.
+- Email or push notifications, notification settings, pop-up notification toasts, deleting
+  notifications (in-app bell and panel only).
+- Due dates, labels, attachments, search, file uploads.
 - Live presence indicators or real-time cursors (changes appear on refresh).
 - Mobile phone layouts.
 
@@ -266,3 +302,7 @@ Make the navigation bar identical on the board, project list and empty board scr
   "Move to" menu on the card.
 - Deleting a comment asks for confirmation; the spec does not require it, but it prevents mistakes.
 - Project cards show a per-column progress bar and a "assigned to you" badge as helpful summaries.
+- The notification panel is a dropdown anchored to the bell, not a separate page; sample
+  notifications and the task "Rotate invoice PDF fonts" are invented.
+- Comment notifications show a one-line preview of the comment; the spec does not require it.
+- The bell badge uses the teal accent; at more than 99 unread it would read "99+" (not designed).

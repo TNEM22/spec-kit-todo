@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Taskify · Customer Portal Kanban Board</title>
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary-fixed": "#23005c",
+            "tertiary-fixed": "#e9ddff",
+            "surface-container-lowest": "#080d1d",
+            "surface-container-highest": "#2f3446",
+            "surface-container-high": "#25293a",
+            "surface-dim": "#0e1323",
+            "on-secondary-fixed": "#07006c",
+            "secondary-fixed": "#e1e0ff",
+            "secondary-fixed-dim": "#c0c1ff",
+            "error-container": "#93000a",
+            "on-secondary-container": "#b0b2ff",
+            "surface-bright": "#34394a",
+            "primary": "#b5fff0",
+            "on-primary": "#003730",
+            "background": "#0e1323",
+            "on-primary-fixed-variant": "#005047",
+            "on-tertiary-container": "#6b37d4",
+            "inverse-surface": "#dee1f9",
+            "secondary-container": "#3131c0",
+            "primary-fixed": "#6ef9e2",
+            "primary-container": "#5eead4",
+            "on-error-container": "#ffdad6",
+            "error": "#ffb4ab",
+            "surface-container": "#1a1f30",
+            "tertiary": "#f6eeff",
+            "on-surface": "#dee1f9",
+            "on-primary-container": "#00675b",
+            "tertiary-container": "#ddcdff",
+            "surface": "#0e1323",
+            "on-background": "#dee1f9",
+            "secondary": "#c0c1ff",
+            "on-secondary-fixed-variant": "#2f2ebe",
+            "primary-fixed-dim": "#4ddcc6",
+            "on-secondary": "#1000a9",
+            "on-primary-fixed": "#00201b",
+            "surface-tint": "#4ddcc6",
+            "surface-container-low": "#161b2b",
+            "tertiary-fixed-dim": "#d0bcff",
+            "on-error": "#690005",
+            "inverse-on-surface": "#2b3041",
+            "on-tertiary-fixed-variant": "#5516be",
+            "surface-variant": "#2f3446",
+            "on-tertiary": "#3c0091",
+            "outline-variant": "#3c4946",
+            "inverse-primary": "#006b5e",
+            "on-surface-variant": "#bbcac5",
+            "outline": "#859490"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin": "2rem",
+            "space-lg": "1.25rem",
+            "space-md": "1rem",
+            "space-sm": "0.5rem",
+            "space-xl": "1.75rem",
+            "space-xs": "0.25rem",
+            "gutter": "1.25rem"
+          },
+          "fontFamily": {
+            "headline-lg": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "headline-xl": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "label-lg": ["14px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500" }],
+            "headline-md": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(94, 234, 212, 0.3);
+    }
+  </style>
+</head>
+<body class="bg-[#0B1020] text-on-surface antialiased overflow-hidden h-screen flex flex-col font-body-md select-none">
+<!-- Ambient Nocturne Glowing Lights (Z-0) -->
+<div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+<div class="absolute -top-40 left-1/4 w-[650px] h-[550px] bg-[#2DD4BF]/12 rounded-full blur-[140px]"></div>
+<div class="absolute top-1/3 -left-32 w-[600px] h-[600px] bg-[#6366F1]/10 rounded-full blur-[150px]"></div>
+<div class="absolute -bottom-32 right-1/4 w-[700px] h-[550px] bg-[#8B5CF6]/12 rounded-full blur-[160px]"></div>
+<div class="absolute top-20 right-10 w-[450px] h-[450px] bg-[#5EEAD4]/8 rounded-full blur-[130px]"></div>
+</div>
+<!-- ========================================================================= -->
+<!-- 1. TOP APP BAR (Shared Component: TopNavBar with frosted execution)     -->
+<!-- ========================================================================= -->
+<header class="bg-surface-container-low/80 backdrop-blur-xl border-b border-outline-variant/30 shadow-[0_8px_24px_-4px_rgba(0,0,0,0.35)] docked full-width top-0 sticky z-50">
+<div class="flex justify-between items-center w-full px-8 py-3">
+<!-- Left side: Brand + Breadcrumbs + Search -->
+<div class="flex items-center gap-6">
+<!-- Brand & Luminous Icon -->
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#00675b] via-primary-container to-primary flex items-center justify-center shadow-[0_0_16px_rgba(94,234,212,0.4)]">
+<span class="material-symbols-outlined text-[#0B1020] text-xl font-bold" data-icon="auto_awesome" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<span class="font-headline-lg text-headline-lg font-bold tracking-tight text-on-surface">Taskify</span>
+</div>
+<!-- Breadcrumb separator -->
+<div class="h-4 w-[1px] bg-outline-variant/50 hidden sm:block"></div>
+<nav class="hidden md:flex items-center gap-2 font-label-md text-label-md">
+<span class="text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer">Projects</span>
+<span class="material-symbols-outlined text-outline text-sm" data-icon="chevron_right">chevron_right</span>
+<span class="text-primary font-semibold flex items-center gap-1.5 bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+            Customer Portal
+          </span>
+</nav>
+<!-- Search Bar with Shortcut -->
+<div class="relative ml-2 hidden lg:block">
+<div class="flex items-center bg-white/[0.05] border border-white/[0.12] focus-within:border-primary-container focus-within:ring-2 focus-within:ring-primary-container/20 rounded-xl px-3 py-1.5 w-64 transition-all duration-200">
+<span class="material-symbols-outlined text-outline text-lg mr-2" data-icon="search">search</span>
+<input class="bg-transparent border-0 p-0 text-on-surface text-body-sm font-body-sm placeholder:text-on-surface-variant/60 focus:ring-0 focus:outline-none w-full" placeholder="Search tasks, docs..." type="text"/>
+<kbd class="ml-1 px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-white/[0.08] text-on-surface-variant border border-white/[0.12] rounded">⌘K</kbd>
+</div>
+</div>
+</div>
+<!-- Center Links (Desktop navigation links from JSON: Workspace, Boards, Timeline, Analytics) -->
+<nav class="hidden xl:flex items-center gap-8">
+<a class="text-on-surface-variant hover:text-on-surface transition-colors pb-1 font-label-lg text-label-lg" href="#">Workspace</a>
+<a class="text-primary border-b-2 border-primary font-semibold pb-1 font-label-lg text-label-lg" href="#">Boards</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors pb-1 font-label-lg text-label-lg" href="#">Timeline</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors pb-1 font-label-lg text-label-lg" href="#">Analytics</a>
+</nav>
+<!-- Right Trailing Cluster -->
+<div class="flex items-center gap-3">
+<!-- Trailing icon actions -->
+<button class="relative p-2 rounded-full hover:bg-surface-variant/40 text-on-surface-variant hover:text-on-surface transition-all active:scale-[0.98]" title="Notifications">
+<span class="material-symbols-outlined text-xl" data-icon="notifications">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary-container ring-2 ring-background"></span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-variant/40 text-on-surface-variant hover:text-on-surface transition-all active:scale-[0.98]" title="Tune &amp; Filters">
+<span class="material-symbols-outlined text-xl" data-icon="tune">tune</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-variant/40 text-on-surface-variant hover:text-on-surface transition-all active:scale-[0.98]" title="Help">
+<span class="material-symbols-outlined text-xl" data-icon="help">help</span>
+</button>
+<!-- Divider -->
+<div class="h-5 w-[1px] bg-outline-variant/40 mx-1"></div>
+<!-- Trailing secondary action ("Share") -->
+<button class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/[0.08] border border-white/[0.14] text-on-surface font-label-md text-label-md hover:bg-white/[0.14] transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined text-base" data-icon="share">share</span>
+          Share
+        </button>
+<!-- Profile Chip -->
+<div class="flex items-center gap-2 pl-1 pr-1.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] hover:border-white/[0.18] transition-all">
+<div class="w-7 h-7 rounded-full bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] text-white flex items-center justify-center font-bold text-xs shadow-inner">
+            SL
+          </div>
+<div class="hidden md:flex flex-col text-left leading-tight pr-1">
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Sam Lee</span>
+<span class="text-[10px] text-on-surface-variant">Engineer</span>
+</div>
+<button class="text-[11px] font-label-sm px-2 py-0.5 rounded-full bg-white/[0.08] text-primary-fixed hover:bg-white/[0.14] transition-colors border border-white/[0.1]">
+            Switch
+          </button>
+</div>
+</div>
+</div>
+</header>
+<!-- ========================================================================= -->
+<!-- SUB-HEADER / BOARD CONTROL STRIP                                         -->
+<!-- ========================================================================= -->
+<div class="relative z-30 px-8 py-3.5 flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.06] bg-[#0E1323]/50 backdrop-blur-md">
+<!-- Left: Board Title & Active Sprint Pill -->
+<div class="flex items-center gap-4 flex-wrap">
+<div class="flex items-center gap-2.5">
+<h1 class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight">Customer Portal</h1>
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#5EEAD4]/10 border border-[#5EEAD4]/30 text-primary-container font-label-sm text-label-sm shadow-[0_0_12px_rgba(94,234,212,0.15)]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#5EEAD4] animate-pulse"></span>
+          Sprint 24 · Active
+        </div>
+</div>
+<!-- Team Avatar Stack -->
+<div class="flex items-center -space-x-2 pl-2">
+<div class="w-7 h-7 rounded-full bg-[#6366F1] text-white text-[11px] font-bold flex items-center justify-center border-2 border-[#0B1020]" title="Sam Lee (You)">SL</div>
+<div class="w-7 h-7 rounded-full bg-[#EC4899] text-white text-[11px] font-bold flex items-center justify-center border-2 border-[#0B1020]" title="Taylor Brooks">TB</div>
+<div class="w-7 h-7 rounded-full bg-[#10B981] text-white text-[11px] font-bold flex items-center justify-center border-2 border-[#0B1020]" title="Riley Chen">RC</div>
+<div class="w-7 h-7 rounded-full bg-[#F59E0B] text-white text-[11px] font-bold flex items-center justify-center border-2 border-[#0B1020]" title="Alex Morgan">AM</div>
+<div class="w-7 h-7 rounded-full bg-[#8B5CF6] text-white text-[11px] font-bold flex items-center justify-center border-2 border-[#0B1020]" title="Jordan Park">JP</div>
+<div class="w-7 h-7 rounded-full bg-white/[0.08] text-on-surface-variant text-[11px] font-medium flex items-center justify-center border-2 border-[#0B1020] hover:bg-white/[0.14] cursor-pointer">+3</div>
+</div>
+</div>
+<!-- Right: View switch, Filter, and "+ New task" CTA -->
+<div class="flex items-center gap-3">
+<!-- View toggle -->
+<div class="flex items-center p-1 rounded-full bg-white/[0.04] border border-white/[0.1]">
+<button class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.12] text-on-surface font-label-sm text-label-sm font-semibold shadow-[0_2px_8px_rgba(0,0,0,0.2)]">
+<span class="material-symbols-outlined text-sm" data-icon="view_kanban">view_kanban</span>
+          Board
+        </button>
+<button class="flex items-center gap-1.5 px-3 py-1 rounded-full text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="table_rows">table_rows</span>
+          List
+        </button>
+</div>
+<!-- Filter button -->
+<button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.12] text-on-surface-variant hover:text-on-surface font-label-md text-label-md hover:bg-white/[0.1] transition-all">
+<span class="material-symbols-outlined text-base" data-icon="filter_list">filter_list</span>
+        Filter
+      </button>
+<!-- Primary CTA: "+ New task" -->
+<button class="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary-container text-[#0B1020] font-label-md text-label-md font-bold hover:brightness-110 shadow-[0_0_16px_rgba(94,234,212,0.35)] hover:shadow-[0_0_22px_rgba(94,234,212,0.5)] transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined text-lg font-bold" data-icon="add">add</span>
+        New task
+      </button>
+</div>
+</div>
+<!-- ========================================================================= -->
+<!-- MAIN WORKSPACE: KANBAN BOARD + RIGHT DRAWER OVERLAY                      -->
+<!-- ========================================================================= -->
+<main class="relative flex-1 overflow-hidden flex">
+<!-- 2. KANBAN BOARD CONTAINER (Under Drawer Backdrop) -->
+<div class="flex-1 overflow-x-auto overflow-y-hidden p-8 flex gap-gutter transition-all duration-300 custom-scrollbar pr-[520px]">
+<!-- ==================== COLUMN 1: TO DO ==================== -->
+<div class="flex-1 min-w-[310px] max-w-[370px] flex flex-col rounded-[20px] bg-white/[0.04] backdrop-blur-[24px] border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.25)] h-full max-h-full">
+<!-- Header -->
+<div class="p-4 flex items-center justify-between border-b border-white/[0.06]">
+<div class="flex items-center gap-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#94A3B8]"></span>
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">To Do</span>
+<span class="px-2 py-0.5 rounded-full bg-white/[0.06] text-on-surface-variant font-label-sm text-label-sm">2</span>
+</div>
+<button class="p-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/[0.06]">
+<span class="material-symbols-outlined text-lg" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+<!-- Cards List -->
+<div class="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar">
+<!-- Card 1 -->
+<div class="group rounded-[16px] bg-white/[0.06] backdrop-blur-[16px] border border-white/[0.12] p-4 shadow-[0_8px_24px_-4px_rgba(0,0,0,0.35)] hover:border-white/[0.22] hover:-translate-y-0.5 transition-all cursor-pointer">
+<div class="flex items-center justify-between text-on-surface-variant text-[11px] mb-2 font-mono">
+<span>#TP-088</span>
+<span class="px-2 py-0.5 rounded-full bg-white/[0.06] text-on-surface-variant font-sans">Auth Flow</span>
+</div>
+<h4 class="font-headline-md text-base text-on-surface font-semibold mb-1 group-hover:text-primary transition-colors">Implement OAuth2 Google SSO</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-3">Add Google identity provider callback routing and token validation endpoints.</p>
+<div class="flex items-center justify-between pt-2 border-t border-white/[0.05]">
+<div class="flex items-center gap-1.5 text-on-surface-variant text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-sm" data-icon="check_circle">check_circle</span>
+<span>2/5</span>
+</div>
+<div class="w-6 h-6 rounded-full bg-[#EC4899] text-white text-[10px] font-bold flex items-center justify-center">TB</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group rounded-[16px] bg-white/[0.06] backdrop-blur-[16px] border border-white/[0.12] p-4 shadow-[0_8px_24px_-4px_rgba(0,0,0,0.35)] hover:border-white/[0.22] hover:-translate-y-0.5 transition-all cursor-pointer">
+<div class="flex items-center justify-between text-on-surface-variant text-[11px] mb-2 font-mono">
+<span>#TP-094</span>
+<span class="px-2 py-0.5 rounded-full bg-white/[0.06] text-on-surface-variant font-sans">Security</span>
+</div>
+<h4 class="font-headline-md text-base text-on-surface font-semibold mb-1 group-hover:text-primary transition-colors">Session timeout warning modal</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-3">Prompt users 60 seconds prior to JWT expiration with automatic renewal.</p>
+<div class="flex items-center justify-between pt-2 border-t border-white/[0.05]">
+<div class="flex items-center gap-1.5 text-on-surface-variant text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-sm" data-icon="chat_bubble">chat_bubble</span>
+<span>1</span>
+</div>
+<div class="w-6 h-6 rounded-full bg-[#10B981] text-white text-[10px] font-bold flex items-center justify-center">RC</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ==================== COLUMN 2: IN PROGRESS (SELECTED) ==================== -->
+<div class="flex-1 min-w-[310px] max-w-[370px] flex flex-col rounded-[20px] bg-white/[0.05] backdrop-blur-[24px] border border-primary/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)] h-full max-h-full">
+<!-- Header -->
+<div class="p-4 flex items-center justify-between border-b border-white/[0.06]">
+<div class="flex items-center gap-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#7DD3FC] shadow-[0_0_8px_#7DD3FC]"></span>
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">In Progress</span>
+<span class="px-2 py-0.5 rounded-full bg-[#7DD3FC]/10 text-[#7DD3FC] font-label-sm text-label-sm font-semibold">2</span>
+</div>
+<button class="p-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/[0.06]">
+<span class="material-symbols-outlined text-lg" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+<!-- Cards List -->
+<div class="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar">
+<!-- Card 1: SELECTED TASK -->
+<div class="relative rounded-[16px] bg-white/[0.11] backdrop-blur-[20px] border-2 border-primary shadow-[0_0_24px_rgba(94,234,212,0.2),inset_0_1px_0_0_rgba(255,255,255,0.25)] p-4 cursor-pointer scale-[1.01] transition-all">
+<div class="absolute -top-2.5 right-4 px-2 py-0.5 rounded-full bg-primary-container text-[#0B1020] text-[10px] font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(94,234,212,0.4)]">
+              Active Focus
+            </div>
+<div class="flex items-center justify-between text-on-surface-variant text-[11px] mb-2 font-mono">
+<span class="text-primary font-bold">#TP-092</span>
+<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/30 font-sans font-semibold">Sprint 24</span>
+</div>
+<h4 class="font-headline-md text-base text-on-surface font-bold mb-1 text-white">Build account settings page</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-3">Let users update their display name, email preferences and time zone.</p>
+<div class="flex items-center justify-between pt-2 border-t border-white/[0.08]">
+<div class="flex items-center gap-3 text-on-surface-variant text-label-sm font-label-sm">
+<span class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-sm" data-icon="check_box" style="font-variation-settings: 'FILL' 1;">check_box</span>
+                  6/8
+                </span>
+<span class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="chat_bubble">chat_bubble</span>
+                  2
+                </span>
+</div>
+<div class="w-6 h-6 rounded-full bg-[#6366F1] text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-primary">SL</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group rounded-[16px] bg-white/[0.06] backdrop-blur-[16px] border border-white/[0.12] p-4 shadow-[0_8px_24px_-4px_rgba(0,0,0,0.35)] hover:border-white/[0.22] hover:-translate-y-0.5 transition-all cursor-pointer">
+<div class="flex items-center justify-between text-on-surface-variant text-[11px] mb-2 font-mono">
+<span>#TP-085</span>
+<span class="px-2 py-0.5 rounded-full bg-white/[0.06] text-on-surface-variant font-sans">Billing</span>
+</div>
+<h4 class="font-headline-md text-base text-on-surface font-semibold mb-1 group-hover:text-primary transition-colors">Stripe subscription receipt webhook</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-3">Send automated PDF receipt invoice copy upon successful charge webhook dispatch.</p>
+<div class="flex items-center justify-between pt-2 border-t border-white/[0.05]">
+<div class="flex items-center gap-1.5 text-on-surface-variant text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-sm" data-icon="check_circle">check_circle</span>
+<span>3/3</span>
+</div>
+<div class="w-6 h-6 rounded-full bg-[#F59E0B] text-white text-[10px] font-bold flex items-center justify-center">AM</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ==================== COLUMN 3: IN REVIEW ==================== -->
+<div class="flex-1 min-w-[310px] max-w-[370px] flex flex-col rounded-[20px] bg-white/[0.04] backdrop-blur-[24px] border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.25)] h-full max-h-full">
+<!-- Header -->
+<div class="p-4 flex items-center justify-between border-b border-white/[0.06]">
+<div class="flex items-center gap-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#FCD34D] shadow-[0_0_8px_#FCD34D]"></span>
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">In Review</span>
+<span class="px-2 py-0.5 rounded-full bg-white/[0.06] text-on-surface-variant font-label-sm text-label-sm">2</span>
+</div>
+<button class="p-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/[0.06]">
+<span class="material-symbols-outlined text-lg" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+<!-- Cards List -->
+<div class="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar">
+<div class="group rounded-[16px] bg-white/[0.06] backdrop-blur-[16px] border border-white/[0.12] p-4 shadow-[0_8px_24px_-4px_rgba(0,0,0,0.35)] hover:border-white/[0.22] hover:-translate-y-0.5 transition-all cursor-pointer">
+<div class="flex items-center justify-between text-on-surface-variant text-[11px] mb-2 font-mono">
+<span>#TP-079</span>
+<span class="px-2 py-0.5 rounded-full bg-[#FCD34D]/10 text-[#FCD34D] font-sans">PR #142</span>
+</div>
+<h4 class="font-headline-md text-base text-on-surface font-semibold mb-1 group-hover:text-primary transition-colors">Fluid Dark Glass tokens in Figma</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-3">Sync chromatic elevation palettes with Tailwind extended configuration tokens.</p>
+<div class="flex items-center justify-between pt-2 border-t border-white/[0.05]">
+<div class="flex items-center gap-1.5 text-on-surface-variant text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-sm" data-icon="chat_bubble">chat_bubble</span>
+<span>4</span>
+</div>
+<div class="w-6 h-6 rounded-full bg-[#8B5CF6] text-white text-[10px] font-bold flex items-center justify-center">JP</div>
+</div>
+</div>
+<div class="group rounded-[16px] bg-white/[0.06] backdrop-blur-[16px] border border-white/[0.12] p-4 shadow-[0_8px_24px_-4px_rgba(0,0,0,0.35)] hover:border-white/[0.22] hover:-translate-y-0.5 transition-all cursor-pointer">
+<div class="flex items-center justify-between text-on-surface-variant text-[11px] mb-2 font-mono">
+<span>#TP-081</span>
+<span class="px-2 py-0.5 rounded-full bg-white/[0.06] text-on-surface-variant font-sans">API</span>
+</div>
+<h4 class="font-headline-md text-base text-on-surface font-semibold mb-1 group-hover:text-primary transition-colors">Rate limiter for avatar uploads</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-3">Cap S3 presigned asset generation to 10 requests per user/hour.</p>
+<div class="flex items-center justify-between pt-2 border-t border-white/[0.05]">
+<div class="flex items-center gap-1.5 text-on-surface-variant text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-sm" data-icon="check_circle">check_circle</span>
+<span>1/1</span>
+</div>
+<div class="w-6 h-6 rounded-full bg-[#10B981] text-white text-[10px] font-bold flex items-center justify-center">RC</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ==================== COLUMN 4: DONE ==================== -->
+<div class="flex-1 min-w-[310px] max-w-[370px] flex flex-col rounded-[20px] bg-white/[0.04] backdrop-blur-[24px] border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.25)] h-full max-h-full">
+<!-- Header -->
+<div class="p-4 flex items-center justify-between border-b border-white/[0.06]">
+<div class="flex items-center gap-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#86EFAC] shadow-[0_0_8px_#86EFAC]"></span>
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">Done</span>
+<span class="px-2 py-0.5 rounded-full bg-white/[0.06] text-on-surface-variant font-label-sm text-label-sm">2</span>
+</div>
+<button class="p-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/[0.06]">
+<span class="material-symbols-outlined text-lg" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+<!-- Cards List -->
+<div class="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar">
+<div class="group rounded-[16px] bg-white/[0.04] backdrop-blur-[16px] border border-white/[0.08] p-4 opacity-80 hover:opacity-100 transition-all cursor-pointer">
+<div class="flex items-center justify-between text-on-surface-variant text-[11px] mb-2 font-mono">
+<span class="line-through">#TP-067</span>
+<span class="px-2 py-0.5 rounded-full bg-[#86EFAC]/10 text-[#86EFAC] font-sans">Merged</span>
+</div>
+<h4 class="font-headline-md text-base text-on-surface/90 font-medium line-through mb-1">Database migration for tenant IDs</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-3">Backfill partitioned multi-tenant keys across customer preference rows.</p>
+<div class="flex items-center justify-between pt-2 border-t border-white/[0.05]">
+<div class="flex items-center gap-1.5 text-on-surface-variant text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-sm text-[#86EFAC]" data-icon="task_alt">task_alt</span>
+<span>Complete</span>
+</div>
+<div class="w-6 h-6 rounded-full bg-[#6366F1] text-white text-[10px] font-bold flex items-center justify-center">SL</div>
+</div>
+</div>
+<div class="group rounded-[16px] bg-white/[0.04] backdrop-blur-[16px] border border-white/[0.08] p-4 opacity-80 hover:opacity-100 transition-all cursor-pointer">
+<div class="flex items-center justify-between text-on-surface-variant text-[11px] mb-2 font-mono">
+<span class="line-through">#TP-071</span>
+<span class="px-2 py-0.5 rounded-full bg-[#86EFAC]/10 text-[#86EFAC] font-sans">Merged</span>
+</div>
+<h4 class="font-headline-md text-base text-on-surface/90 font-medium line-through mb-1">Upgrade Tailwind configuration</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-3">Incorporate dark mode classes, surface tiers and Plus Jakarta Sans fonts.</p>
+<div class="flex items-center justify-between pt-2 border-t border-white/[0.05]">
+<div class="flex items-center gap-1.5 text-on-surface-variant text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-sm text-[#86EFAC]" data-icon="task_alt">task_alt</span>
+<span>Complete</span>
+</div>
+<div class="w-6 h-6 rounded-full bg-[#8B5CF6] text-white text-[10px] font-bold flex items-center justify-center">JP</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Backdrop Dimmer Layer for background under right drawer -->
+<div class="absolute inset-y-0 right-0 w-[496px] bg-[#080D1D]/35 backdrop-blur-[4px] pointer-events-none z-30"></div>
+<!-- ========================================================================= -->
+<!-- 3. TASK DETAIL DRAWER (Slides in / docked right ~480px width)             -->
+<!-- ========================================================================= -->
+<aside class="w-[490px] h-full fixed right-0 top-[65px] bottom-[37px] z-40 bg-[#0E1323]/90 backdrop-blur-[32px] border-l border-white/[0.14] shadow-[0_20px_48px_-8px_rgba(0,0,0,0.7)] flex flex-col overflow-hidden">
+<!-- Top Row: Status pill, action menu, close icon -->
+<div class="p-4 px-6 flex items-center justify-between border-b border-white/[0.08] bg-white/[0.02]">
+<div class="flex items-center gap-2">
+<div class="flex items-center gap-2 px-3 py-1 rounded-full bg-[#7DD3FC]/10 border border-[#7DD3FC]/30 text-[#7DD3FC] font-label-sm text-label-sm font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-[#7DD3FC]"></span>
+            ● In Progress
+          </div>
+<span class="text-outline text-xs">#TP-092</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<button class="p-1.5 rounded-lg hover:bg-white/[0.08] hover:text-on-surface transition-colors" title="Actions menu">
+<span class="material-symbols-outlined text-xl" data-icon="more_horiz">more_horiz</span>
+</button>
+<button class="p-1.5 rounded-lg hover:bg-white/[0.08] hover:text-on-surface transition-colors" title="Close drawer">
+<span class="material-symbols-outlined text-xl" data-icon="close">close</span>
+</button>
+</div>
+</div>
+<!-- Drawer Scrollable Content -->
+<div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
+<!-- Task Title & Subtitle -->
+<div>
+<h2 class="font-headline-lg text-[22px] font-bold text-white tracking-tight leading-snug">
+            Build account settings page
+          </h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant/70 mt-1 flex items-center gap-2">
+<span>Created Oct 8</span>
+<span>•</span>
+<span>Updated Oct 10</span>
+</p>
+</div>
+<!-- Meta Details Box -->
+<div class="p-4 rounded-2xl bg-white/[0.04] border border-white/[0.08] space-y-3.5">
+<!-- STATUS Dropdown -->
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Status</span>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.12] text-on-surface text-label-sm font-label-sm transition-all">
+<span class="w-2 h-2 rounded-full bg-[#7DD3FC]"></span>
+<span>● In Progress</span>
+<span class="material-symbols-outlined text-xs text-outline" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+<!-- ASSIGNEE Dropdown -->
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Assignee</span>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.12] text-on-surface text-label-sm font-label-sm transition-all">
+<div class="w-5 h-5 rounded-full bg-[#6366F1] text-white text-[10px] font-bold flex items-center justify-center">SL</div>
+<span>Sam Lee (You)</span>
+<span class="material-symbols-outlined text-xs text-outline" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+<!-- Tags -->
+<div class="flex items-center justify-between pt-1 border-t border-white/[0.04]">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Tags</span>
+<div class="flex items-center gap-1.5 flex-wrap justify-end">
+<span class="px-2.5 py-0.5 rounded-full bg-white/[0.06] border border-white/[0.1] text-primary text-[11px] font-mono">#TP-092</span>
+<span class="px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary-fixed text-[11px] font-medium">Sprint 24</span>
+<span class="px-2.5 py-0.5 rounded-full bg-white/[0.06] border border-white/[0.1] text-on-surface text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-primary-container" data-icon="check_circle">check_circle</span>
+                Subtasks 6/8
+              </span>
+</div>
+</div>
+</div>
+<!-- DESCRIPTION SECTION -->
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md font-semibold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-base text-primary-container" data-icon="subject">subject</span>
+              Description
+            </span>
+<button class="text-primary hover:text-primary-fixed font-label-sm text-label-sm flex items-center gap-1 hover:underline">
+<span class="material-symbols-outlined text-sm" data-icon="edit">edit</span>
+              Edit
+            </button>
+</div>
+<div class="p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-on-surface/90 text-body-md font-body-md leading-relaxed">
+            Let users update their display name, email preferences and time zone.
+          </div>
+</div>
+<!-- COMMENTS SECTION -->
+<div class="space-y-4 pt-2">
+<!-- Header with Comments • 2 & Sort -->
+<div class="flex items-center justify-between border-b border-white/[0.06] pb-2">
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-base font-semibold text-white">Comments</span>
+<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm font-bold">2</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant font-label-sm text-label-sm cursor-pointer hover:text-on-surface">
+<span>Oldest first</span>
+<span class="material-symbols-outlined text-sm" data-icon="unfold_more">unfold_more</span>
+</div>
+</div>
+<!-- SHOWING EXACTLY TWO COMMENTS (Deleted comment by Sam Lee is gone) -->
+<div class="space-y-3.5">
+<!-- Comment 1: Alex Morgan -->
+<div class="flex items-start gap-3 group">
+<div class="w-8 h-8 rounded-full bg-[#F59E0B] text-white text-xs font-bold flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                AM
+              </div>
+<div class="flex-1 space-y-1">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md font-semibold text-white">Alex Morgan</span>
+<span class="text-[11px] text-on-surface-variant font-body-sm">Oct 9, 10:14</span>
+</div>
+<div class="p-3 rounded-2xl rounded-tl-sm bg-white/[0.05] border border-white/[0.08] text-body-sm font-body-sm text-on-surface leading-relaxed">
+                  Please match the layout of the billing settings page.
+                </div>
+</div>
+</div>
+<!-- Comment 2: Riley Chen -->
+<div class="flex items-start gap-3 group">
+<div class="w-8 h-8 rounded-full bg-[#10B981] text-white text-xs font-bold flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                RC
+              </div>
+<div class="flex-1 space-y-1">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md font-semibold text-white">Riley Chen</span>
+<span class="text-[11px] text-on-surface-variant font-body-sm">Oct 9, 15:40</span>
+</div>
+<div class="p-3 rounded-2xl rounded-tl-sm bg-white/[0.05] border border-white/[0.08] text-body-sm font-body-sm text-on-surface leading-relaxed">
+                  Time zone list is ready in the shared components.
+                </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- COMMENT INPUT FOOTER -->
+<div class="p-4 border-t border-white/[0.08] bg-[#0B1020]/80 backdrop-blur-md space-y-2.5">
+<div class="relative">
+<textarea class="w-full bg-white/[0.05] border border-white/[0.12] focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-xl p-3 text-body-sm font-body-sm text-on-surface placeholder:text-on-surface-variant/60 resize-none outline-none transition-all" placeholder="Add a comment..." rows="2"></textarea>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1 text-on-surface-variant">
+<button class="p-1.5 rounded-lg hover:bg-white/[0.08] hover:text-on-surface transition-colors" title="Attach file">
+<span class="material-symbols-outlined text-lg" data-icon="attach_file">attach_file</span>
+</button>
+<button class="p-1.5 rounded-lg hover:bg-white/[0.08] hover:text-on-surface transition-colors" title="Mention teammate">
+<span class="material-symbols-outlined text-lg" data-icon="alternate_email">alternate_email</span>
+</button>
+<button class="p-1.5 rounded-lg hover:bg-white/[0.08] hover:text-on-surface transition-colors" title="Add emoji">
+<span class="material-symbols-outlined text-lg" data-icon="mood">mood</span>
+</button>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-[11px] font-mono text-on-surface-variant">0 / 2000</span>
+<button class="px-4 py-1.5 rounded-full bg-primary-container text-[#0B1020] font-label-md text-label-md font-bold hover:brightness-110 shadow-[0_0_12px_rgba(94,234,212,0.3)] transition-all active:scale-[0.98]">
+              Post
+            </button>
+</div>
+</div>
+</div>
+</aside>
+</main>
+<!-- ========================================================================= -->
+<!-- 4. TOAST NOTIFICATION (Bottom Right Corner Floating)                      -->
+<!-- ========================================================================= -->
+<div class="fixed bottom-12 right-6 z-50 animate-bounce-short">
+<div class="w-[390px] rounded-[16px] bg-[#0E1323]/90 backdrop-blur-[24px] border border-white/[0.14] shadow-[0_16px_36px_-4px_rgba(0,0,0,0.6),0_0_24px_-2px_rgba(252,211,77,0.22)] p-4 flex items-start gap-3.5 relative overflow-hidden group">
+<!-- Amber Left Edge Accent Line -->
+<div class="absolute left-0 top-0 bottom-0 w-[4px] bg-[#FCD34D] shadow-[0_0_12px_#FCD34D]"></div>
+<!-- Amber Info Icon -->
+<div class="w-8 h-8 rounded-full bg-[#FCD34D]/15 border border-[#FCD34D]/30 text-[#FCD34D] flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_10px_rgba(252,211,77,0.2)]">
+<span class="material-symbols-outlined text-lg" data-icon="info" style="font-variation-settings: 'FILL' 1;">info</span>
+</div>
+<!-- Toast Content -->
+<div class="flex-1 pr-4">
+<h5 class="text-white font-semibold font-headline-md text-sm leading-snug">
+          That comment no longer exists
+        </h5>
+<p class="font-body-sm text-body-sm text-on-surface-variant/90 mt-0.5 leading-relaxed">
+          Its author deleted it. The view has been refreshed.
+        </p>
+</div>
+<!-- Close / Dismiss Icon -->
+<button class="text-on-surface-variant/70 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/[0.06]" title="Dismiss">
+<span class="material-symbols-outlined text-base" data-icon="close">close</span>
+</button>
+</div>
+</div>
+<!-- ========================================================================= -->
+<!-- 5. FOOTER STATUS BAR                                                      -->
+<!-- ========================================================================= -->
+<footer class="h-9 px-6 bg-surface-container-lowest/90 backdrop-blur-md border-t border-outline-variant/20 flex items-center justify-between text-on-surface-variant font-body-sm text-xs relative z-40">
+<div class="flex items-center gap-5">
+<!-- Operational indicator -->
+<div class="flex items-center gap-1.5 text-[#86EFAC]">
+<span class="w-2 h-2 rounded-full bg-[#86EFAC] shadow-[0_0_6px_#86EFAC] animate-pulse"></span>
+<span class="font-medium">All systems operational</span>
+</div>
+<span class="text-outline-variant/60">•</span>
+<!-- Peer sync indicator -->
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="sync">sync</span>
+<span>Realtime sync active (4 peers connected)</span>
+</div>
+</div>
+<!-- Right keyboard hints & links -->
+<div class="flex items-center gap-4 text-on-surface-variant">
+<span class="hidden sm:inline-flex items-center gap-1 font-mono text-[11px]">
+        Press <kbd class="px-1.5 py-0.5 rounded bg-white/[0.08] border border-white/[0.12] text-on-surface font-semibold">c</kbd> for quick task
+      </span>
+<span class="hidden sm:inline text-outline-variant/60">•</span>
+<a class="hover:text-on-surface transition-colors" href="#">Documentation</a>
+<span class="text-outline-variant/60">•</span>
+<a class="hover:text-on-surface transition-colors flex items-center gap-1" href="#">
+<span>Shortcuts</span>
+<kbd class="px-1 py-0.2 rounded bg-white/[0.06] text-[10px] font-mono">?</kbd>
+</a>
+</div>
+</footer>
+</body></html>

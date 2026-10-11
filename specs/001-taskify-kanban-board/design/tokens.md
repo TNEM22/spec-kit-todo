@@ -1,13 +1,14 @@
 # Design Tokens: Taskify Kanban Board
 
-**Source**: Stitch export `stitch_taskify_aurora_kanban_board.zip` (49bdfe55), 13 screens in
-`screens/*/screen.html`, plus Stitch's design-system note
-`imports/stitch_taskify_aurora_kanban_board-49bdfe55/stitch_taskify_aurora_kanban_board/nocturne_glass/DESIGN.md`
-("Nocturne Glass").
-**Extracted**: 2026-10-11
+**Source**: Stitch exports `stitch_taskify_aurora_kanban_board.zip` (49bdfe55, then 4561c6ba),
+15 screens in `screens/*/screen.html`, plus Stitch's design-system note
+`imports/stitch_taskify_aurora_kanban_board-4561c6ba/stitch_taskify_aurora_kanban_board/nocturne_glass/DESIGN.md`
+("Nocturne Glass", unchanged between exports).
+**Extracted**: 2026-10-11 (merged with the notifications export the same day)
 
-The Stitch output is the reference for implementation. Counts are occurrences across the 13 primary
-screens and show which values are actually used.
+The Stitch output is the reference for implementation. Counts are occurrences across the first 13
+primary screens and show which values are actually used; the notification screens reuse the same
+palette and add the tokens under "Notifications".
 
 ## Colors — app palette (used directly)
 
@@ -78,6 +79,20 @@ Each screen also ships a generated theme. Its main roles:
 | status-glow | `0 0 8px <status color>` | Column dots |
 | drag | scale 1.02, rotate 2°, teal edge at 30% | Card mid-drag |
 
+## Notifications (from `notifications-panel`, `notifications-empty`)
+
+| Name | Value | Where used |
+|------|-------|-----------|
+| bell-button | 40px circle, glass `white/0.06`, border `white/0.14`, inset top `0 1px 0 white/0.15` | Navigation bar bell |
+| bell-active-glow | `0 0 12px rgba(94,234,212,0.4)` | Bell while the panel is open |
+| unread-badge | `#5EEAD4` fill, `#0B1020` text, 18px circle, glow `0 0 10px rgba(94,234,212,0.3)` | Unread count on the bell |
+| panel | width 400px (narrow: `calc(100vw - 1.5rem)`), fill `white/0.12`, border `white/0.14`, blur 2xl (~40px), radius 24px | Notification dropdown |
+| panel-shadow | `0 20px 50px rgba(0,0,0,0.8), 0 0 24px rgba(94,234,212,0.12)` | Notification dropdown |
+| unread-row | brighter glass `white/0.06`, border `white/0.08`, teal dot 8px with `0 0 8px rgba(94,234,212,0.6)` | Unread notification |
+| read-row | no fill, no dot, text at reduced emphasis | Read notification |
+| unread-chip | teal text on 10% teal tint, pill | "3 unread" in the panel header |
+| backdrop-dim | board behind blurred lightly (`blur 2px`) and dimmed | While the panel is open |
+
 ## Typography
 
 Font: **Plus Jakarta Sans** (Google Fonts). Icons: **Material Symbols Outlined**, weight 300.
@@ -136,13 +151,18 @@ default Tailwind. Use the pixel values above, not the class names.
 - **New tokens not in the plan**: input radius 12px, input focus ring, column min/max width, drag
   scale 1.02, Material Symbols icons.
 - **Disabled color** `#6B7491` from the plan is unused.
+- **Notification panel** matches Prompt 7 and S8. Its shadow is heavier than the overlay token
+  (`0.8` vs `0.6` alpha) and adds a faint teal glow; treat it as a panel-specific variant.
+- **Navigation bar (refinement 9)**: only partly applied. The updated `projects` screen has the
+  intended bar (wordmark, breadcrumb, bell, user chip, "Switch user"); use it as the nav reference.
+  The board, drawer and notification frames still show search and tabs.
 
 ## Out-of-scope elements Stitch added (do not implement)
 
 Stitch invented features that the spec excludes. They appear in the mockups but MUST NOT be built:
 
-- Navigation tabs "Workspace", "Boards", "Timeline", "Analytics"; search bar; notifications bell;
-  settings icon; "Board / List" toggle; "Filter" button.
+- Navigation tabs "Workspace", "Boards", "Timeline", "Analytics"; search bar; settings icon;
+  "Board / List" toggle; "Filter" button. (The notifications bell is now **in scope**, spec US5.)
 - Task tags/labels (e.g., "Frontend", "Reports"), ticket IDs (`#TP-092`), checklist counts (`6/8`),
   progress bars, due dates ("2d"), priority flags, comment counts on cards.
 - "Sprint 24 · Active" badge; "Team" avatar group with "+" (adding users); footer with

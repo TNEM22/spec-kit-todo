@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Taskify - Task Details Slide-Over</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-surface": "#dee1f9",
+            "primary-fixed": "#6ef9e2",
+            "surface-variant": "#2f3446",
+            "on-tertiary-container": "#6b37d4",
+            "primary": "#b5fff0",
+            "primary-container": "#5eead4",
+            "tertiary-fixed": "#e9ddff",
+            "secondary-container": "#3131c0",
+            "outline": "#859490",
+            "on-secondary-fixed": "#07006c",
+            "surface-container-highest": "#2f3446",
+            "on-secondary-fixed-variant": "#2f2ebe",
+            "tertiary-fixed-dim": "#d0bcff",
+            "error-container": "#93000a",
+            "surface-container-low": "#161b2b",
+            "on-secondary-container": "#b0b2ff",
+            "secondary-fixed": "#e1e0ff",
+            "on-background": "#dee1f9",
+            "background": "#0e1323",
+            "inverse-primary": "#006b5e",
+            "on-error-container": "#ffdad6",
+            "error": "#ffb4ab",
+            "on-primary-container": "#00675b",
+            "on-error": "#690005",
+            "tertiary-container": "#ddcdff",
+            "on-surface-variant": "#bbcac5",
+            "on-tertiary": "#3c0091",
+            "surface-container-lowest": "#080d1d",
+            "surface-tint": "#4ddcc6",
+            "on-primary": "#003730",
+            "outline-variant": "#3c4946",
+            "surface-bright": "#34394a",
+            "secondary": "#c0c1ff",
+            "tertiary": "#f6eeff",
+            "surface-container-high": "#25293a",
+            "surface-dim": "#0e1323",
+            "on-tertiary-fixed": "#23005c",
+            "on-primary-fixed": "#00201b",
+            "secondary-fixed-dim": "#c0c1ff",
+            "on-primary-fixed-variant": "#005047",
+            "on-tertiary-fixed-variant": "#5516be",
+            "primary-fixed-dim": "#4ddcc6",
+            "on-secondary": "#1000a9",
+            "surface": "#0e1323",
+            "surface-container": "#1a1f30",
+            "inverse-surface": "#dee1f9",
+            "inverse-on-surface": "#2b3041"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-xl": "1.75rem",
+            "gutter": "1.25rem",
+            "space-lg": "1.25rem",
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem",
+            "margin": "2rem",
+            "space-md": "1rem"
+          },
+          "fontFamily": {
+            "body-lg": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"],
+            "headline-xl": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "label-lg": ["14px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "headline-md": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500" }],
+            "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* Custom subtle glass scrolls */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(14, 19, 35, 0.2);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.24);
+    }
+  </style>
+</head>
+<body class="bg-[#0B1020] text-on-surface font-body-md text-body-md antialiased overflow-hidden h-screen w-screen relative select-none">
+<!-- ========================================================================= -->
+<!-- AMBIENT AURORA GLOWS                                                      -->
+<!-- ========================================================================= -->
+<div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+<div class="absolute -top-40 -left-40 w-[600px] h-[600px] bg-[#2DD4BF]/15 rounded-full blur-[140px]"></div>
+<div class="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-[#6366F1]/15 rounded-full blur-[150px]"></div>
+<div class="absolute -bottom-40 right-10 w-[650px] h-[650px] bg-[#8B5CF6]/15 rounded-full blur-[140px]"></div>
+</div>
+<!-- ========================================================================= -->
+<!-- BACKGROUND KANBAN BOARD (Dimmed & Blurred Scrim Behind Drawer)             -->
+<!-- ========================================================================= -->
+<div class="relative z-10 flex flex-col h-screen w-screen overflow-hidden">
+<!-- TopNavBar (Shared Component Blueprint) -->
+<header class="bg-surface-container-low/80 backdrop-blur-xl border-b border-outline-variant/30 shadow-[0_8px_24px_-4px_rgba(0,0,0,0.35)] docked full-width top-0 sticky z-20 flex justify-between items-center w-full px-8 py-3">
+<!-- Left side: Brand + Search -->
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-primary-container to-secondary flex items-center justify-center shadow-[0_0_12px_rgba(94,234,212,0.4)]">
+<span class="material-symbols-outlined text-[#0B1020] text-[20px] font-bold" data-icon="space_dashboard">space_dashboard</span>
+</div>
+<span class="font-headline-lg text-headline-lg font-bold tracking-tight text-on-surface">Taskify</span>
+</div>
+<!-- Search bar on left -->
+<div class="relative w-72">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-[18px]" data-icon="search">search</span>
+<input class="w-full bg-white/[0.05] border border-white/[0.12] rounded-xl pl-9 pr-4 py-1.5 font-body-sm text-body-sm text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container/30 transition-all" placeholder="Search tasks, boards..." type="text"/>
+</div>
+<!-- Navigation Links -->
+<nav class="hidden md:flex items-center gap-6 font-label-lg text-label-lg">
+<a class="text-on-surface-variant hover:text-on-surface transition-colors pb-1" href="#">Workspace</a>
+<a class="text-primary border-b-2 border-primary font-semibold pb-1" href="#">Boards</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors pb-1" href="#">Timeline</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors pb-1" href="#">Analytics</a>
+</nav>
+</div>
+<!-- Right side actions -->
+<div class="flex items-center gap-3">
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 rounded-xl transition-all">
+<span class="material-symbols-outlined text-[20px]" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 rounded-xl transition-all">
+<span class="material-symbols-outlined text-[20px]" data-icon="tune">tune</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 rounded-xl transition-all">
+<span class="material-symbols-outlined text-[20px]" data-icon="help">help</span>
+</button>
+<div class="h-5 w-px bg-outline-variant/40 mx-1"></div>
+<button class="px-4 py-1.5 rounded-full bg-white/[0.08] hover:bg-white/[0.14] border border-white/[0.14] font-label-lg text-label-lg text-on-surface transition-all active:scale-[0.98]">
+          Share
+        </button>
+<button class="px-4 py-1.5 rounded-full bg-primary-container text-on-primary-container font-label-lg text-label-lg font-bold shadow-[0_0_16px_rgba(94,234,212,0.35)] hover:bg-[#2DD4BF] transition-all active:scale-[0.98]">
+          New task
+        </button>
+<div class="ml-2 w-8 h-8 rounded-full ring-2 ring-white/20 overflow-hidden flex items-center justify-center bg-surface-variant text-primary font-bold text-xs" title="Sam Lee profile avatar">
+          SL
+        </div>
+</div>
+</header>
+<!-- Subheader / Board Title & Meta -->
+<div class="px-8 py-5 flex items-center justify-between border-b border-white/[0.06] bg-surface-container-lowest/40 backdrop-blur-md">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[22px]" data-icon="folder_open">folder_open</span>
+<h1 class="font-headline-lg text-headline-lg text-on-surface font-semibold tracking-tight">Customer Portal</h1>
+</div>
+<span class="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-label-sm text-label-sm">Active Sprint 24</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex -space-x-2">
+<div class="w-7 h-7 rounded-full bg-indigo-500/80 border border-white/40 flex items-center justify-center text-[10px] text-white font-bold">AM</div>
+<div class="w-7 h-7 rounded-full bg-amber-500/80 border border-white/40 flex items-center justify-center text-[10px] text-white font-bold">RC</div>
+<div class="w-7 h-7 rounded-full bg-teal-400 border border-white/60 flex items-center justify-center text-[10px] text-[#0B1020] font-bold">SL</div>
+<div class="w-7 h-7 rounded-full bg-surface-variant border border-white/20 flex items-center justify-center text-[10px] text-on-surface font-bold">+4</div>
+</div>
+<button class="px-3 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.1] font-label-md text-label-md text-on-surface-variant flex items-center gap-1.5 transition-all">
+<span class="material-symbols-outlined text-[16px]" data-icon="filter_list">filter_list</span> Filter
+        </button>
+</div>
+</div>
+<!-- Kanban Lanes Workspace Canvas -->
+<main class="flex-1 flex gap-gutter p-8 overflow-x-auto relative">
+<!-- Column 1: To Do -->
+<section class="flex flex-col w-[320px] shrink-0 rounded-[20px] bg-white/[0.04] backdrop-blur-[24px] border border-white/[0.08] p-3 shadow-lg">
+<header class="flex items-center justify-between px-2 py-2 mb-2">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-[#94A3B8] shadow-[0_0_8px_#94A3B8]"></span>
+<span class="font-label-lg text-label-lg text-on-surface">To Do</span>
+<span class="px-2 py-0.5 rounded-full bg-white/[0.06] font-label-sm text-label-sm text-on-surface-variant">4</span>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[18px]" data-icon="more_horiz">more_horiz</span>
+</button>
+</header>
+<div class="space-y-3 overflow-y-auto pr-1">
+<article class="p-4 rounded-[16px] bg-white/[0.08] backdrop-blur-[16px] border border-white/[0.14] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.20),0_8px_24px_-4px_rgba(0,0,0,0.35)]">
+<span class="px-2 py-0.5 rounded-full bg-white/[0.08] text-on-surface-variant font-label-sm text-label-sm">#TP-088</span>
+<h2 class="mt-2 font-headline-md text-headline-md text-[#E6E9F2]">Audit OAuth token refresh flows</h2>
+<p class="mt-1 font-body-sm text-body-sm text-[#A3ACC2]">Handle silent renewals before JWT expiry timeouts.</p>
+</article>
+<article class="p-4 rounded-[16px] bg-white/[0.08] backdrop-blur-[16px] border border-white/[0.14] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.20),0_8px_24px_-4px_rgba(0,0,0,0.35)]">
+<span class="px-2 py-0.5 rounded-full bg-white/[0.08] text-on-surface-variant font-label-sm text-label-sm">#TP-090</span>
+<h2 class="mt-2 font-headline-md text-headline-md text-[#E6E9F2]">Support localized date formatters</h2>
+<p class="mt-1 font-body-sm text-body-sm text-[#A3ACC2]">Integrate Intl.DateTimeFormat with fallback cache.</p>
+</article>
+</div>
+</section>
+<!-- Column 2: In Progress (Contains Active Selected Card) -->
+<section class="flex flex-col w-[320px] shrink-0 rounded-[20px] bg-white/[0.04] backdrop-blur-[24px] border border-white/[0.08] p-3 shadow-lg">
+<header class="flex items-center justify-between px-2 py-2 mb-2">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-[#7DD3FC] shadow-[0_0_8px_#7DD3FC]"></span>
+<span class="font-label-lg text-label-lg text-on-surface">In Progress</span>
+<span class="px-2 py-0.5 rounded-full bg-[#7DD3FC]/15 text-[#7DD3FC] font-label-sm text-label-sm">3</span>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[18px]" data-icon="more_horiz">more_horiz</span>
+</button>
+</header>
+<div class="space-y-3 overflow-y-auto pr-1">
+<!-- SELECTED & ACTIVE TASK CARD -->
+<article class="p-4 rounded-[16px] bg-white/[0.14] backdrop-blur-[20px] border-2 border-primary-container shadow-[0_0_24px_rgba(94,234,212,0.3),inset_0_1px_0_0_rgba(255,255,255,0.3)] ring-1 ring-primary-container/40">
+<div class="flex items-center justify-between">
+<span class="px-2 py-0.5 rounded-full bg-primary-container/20 text-primary-container font-label-sm text-label-sm font-semibold">#TP-092</span>
+<span class="flex items-center gap-1 font-label-sm text-label-sm text-primary">
+<span class="material-symbols-outlined text-[14px]" data-icon="check_circle">check_circle</span> 6/8
+              </span>
+</div>
+<h2 class="mt-2 font-headline-md text-headline-md text-white font-semibold">Build account settings page</h2>
+<p class="mt-1 font-body-sm text-body-sm text-[#E6E9F2]">Let users update their display name, email preferences and time zone.</p>
+<footer class="mt-3 pt-3 border-t border-white/[0.1] flex items-center justify-between">
+<span class="px-2 py-0.5 rounded-full bg-[#7DD3FC]/20 text-[#7DD3FC] font-label-sm text-label-sm">In Progress</span>
+<div class="w-6 h-6 rounded-full bg-primary-container text-[#0B1020] font-bold text-[10px] flex items-center justify-center ring-1 ring-white">SL</div>
+</footer>
+</article>
+<article class="p-4 rounded-[16px] bg-white/[0.08] backdrop-blur-[16px] border border-white/[0.14]">
+<span class="px-2 py-0.5 rounded-full bg-white/[0.08] text-on-surface-variant font-label-sm text-label-sm">#TP-094</span>
+<h2 class="mt-2 font-headline-md text-headline-md text-[#E6E9F2]">Webhook retry mechanism</h2>
+<p class="mt-1 font-body-sm text-body-sm text-[#A3ACC2]">Exponential backoff with dead letter queue alerts.</p>
+</article>
+</div>
+</section>
+<!-- Column 3: In Review -->
+<section class="flex flex-col w-[320px] shrink-0 rounded-[20px] bg-white/[0.04] backdrop-blur-[24px] border border-white/[0.08] p-3 shadow-lg">
+<header class="flex items-center justify-between px-2 py-2 mb-2">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-[#FCD34D] shadow-[0_0_8px_#FCD34D]"></span>
+<span class="font-label-lg text-label-lg text-on-surface">In Review</span>
+<span class="px-2 py-0.5 rounded-full bg-white/[0.06] font-label-sm text-label-sm text-on-surface-variant">2</span>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[18px]" data-icon="more_horiz">more_horiz</span>
+</button>
+</header>
+<div class="space-y-3 overflow-y-auto pr-1">
+<article class="p-4 rounded-[16px] bg-white/[0.08] backdrop-blur-[16px] border border-white/[0.14]">
+<span class="px-2 py-0.5 rounded-full bg-white/[0.08] text-on-surface-variant font-label-sm text-label-sm">#TP-079</span>
+<h2 class="mt-2 font-headline-md text-headline-md text-[#E6E9F2]">Billing invoice PDF download</h2>
+<p class="mt-1 font-body-sm text-body-sm text-[#A3ACC2]">Serverless Puppeteer renderer generation test suite.</p>
+</article>
+</div>
+</section>
+<!-- Column 4: Done -->
+<section class="flex flex-col w-[320px] shrink-0 rounded-[20px] bg-white/[0.04] backdrop-blur-[24px] border border-white/[0.08] p-3 shadow-lg">
+<header class="flex items-center justify-between px-2 py-2 mb-2">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-[#86EFAC] shadow-[0_0_8px_#86EFAC]"></span>
+<span class="font-label-lg text-label-lg text-on-surface">Done</span>
+<span class="px-2 py-0.5 rounded-full bg-white/[0.06] font-label-sm text-label-sm text-on-surface-variant">5</span>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[18px]" data-icon="more_horiz">more_horiz</span>
+</button>
+</header>
+<div class="space-y-3 overflow-y-auto pr-1">
+<article class="p-4 rounded-[16px] bg-white/[0.08] backdrop-blur-[16px] border border-white/[0.14] opacity-80">
+<span class="px-2 py-0.5 rounded-full bg-white/[0.08] text-on-surface-variant font-label-sm text-label-sm">#TP-071</span>
+<h2 class="mt-2 font-headline-md text-headline-md text-[#E6E9F2] line-through">Color palette theme config</h2>
+<p class="mt-1 font-body-sm text-body-sm text-[#A3ACC2]">Exported CSS custom variables &amp; tokens.</p>
+</article>
+</div>
+</section>
+</main>
+</div>
+<!-- ========================================================================= -->
+<!-- OVERLAY SCRIM (Dimming & Soft Blur for Contextual Focus)                  -->
+<!-- ========================================================================= -->
+<div class="fixed inset-0 z-30 bg-[#080D1D]/60 backdrop-blur-[3px] transition-opacity duration-300"></div>
+<!-- ========================================================================= -->
+<!-- SLIDE-OVER DRAWER (Task Details - Fixed to Right Edge)                    -->
+<!-- ========================================================================= -->
+<aside class="fixed right-0 top-0 h-screen w-full max-w-lg md:w-[480px] z-40 bg-surface-container/90 backdrop-blur-2xl rounded-l-3xl border-l border-white/[0.14] shadow-[-16px_0_40px_rgba(0,0,0,0.6)] flex flex-col overflow-hidden animate-in slide-in-from-right duration-300 ease-out">
+<!-- Top Decorative Highlight Edge -->
+<div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent pointer-events-none"></div>
+<!-- DRAWER HEADER -->
+<div class="p-6 border-b border-white/[0.1] bg-surface-container-high/40 shrink-0">
+<!-- Status pill chip & Close button -->
+<div class="flex items-center justify-between mb-4">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#7DD3FC]/10 border border-[#7DD3FC]/30 shadow-[0_0_12px_rgba(125,211,252,0.15)]">
+<span class="w-2 h-2 rounded-full bg-[#7DD3FC] shadow-[0_0_8px_#7DD3FC] animate-pulse"></span>
+<span class="font-label-sm text-label-sm font-semibold text-[#7DD3FC] tracking-wide">In Progress</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-white/[0.08] rounded-xl transition-all" title="More options">
+<span class="material-symbols-outlined text-[20px]" data-icon="more_horiz">more_horiz</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-white hover:bg-white/[0.12] rounded-full ring-1 ring-white/10 transition-all active:scale-95" title="Close drawer">
+<span class="material-symbols-outlined text-[20px]" data-icon="close">close</span>
+</button>
+</div>
+</div>
+<!-- Editable Task Title Area -->
+<div class="group flex items-start justify-between gap-3 cursor-pointer">
+<h1 class="font-headline-md text-headline-md font-semibold text-white tracking-tight leading-snug">
+          Build account settings page
+        </h1>
+<button class="p-1 text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity hover:text-primary-container" title="Edit title">
+<span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span>
+</button>
+</div>
+<!-- Secondary Metadata Line -->
+<p class="mt-2 text-[#A3ACC2] font-body-sm text-body-sm flex items-center gap-2">
+<span>Created Oct 8</span>
+<span class="inline-block w-1 h-1 rounded-full bg-outline"></span>
+<span>Updated Oct 10</span>
+</p>
+</div>
+<!-- DRAWER SCROLLABLE CONTENT BODY -->
+<div class="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+<!-- DETAILS SECTION -->
+<div class="space-y-4">
+<!-- Field 1: Status Selector -->
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Status</label>
+<button class="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.12] text-on-surface transition-all group">
+<span class="w-2 h-2 rounded-full bg-[#7DD3FC] shadow-[0_0_6px_#7DD3FC]"></span>
+<span class="font-label-lg text-label-lg font-medium text-[#E6E9F2]">In Progress</span>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-on-surface text-[18px]" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+<!-- Field 2: Assignee Selector -->
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Assignee</label>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.12] text-on-surface transition-all group">
+<div class="w-6 h-6 rounded-full bg-[#5EEAD4] text-[#0B1020] font-bold text-[10px] flex items-center justify-center shadow-[0_0_8px_rgba(94,234,212,0.4)]">
+              SL
+            </div>
+<span class="font-label-lg text-label-lg font-medium text-[#E6E9F2]">Sam Lee</span>
+<span class="px-1.5 py-0.2 rounded-full bg-[#5EEAD4]/20 text-[#5EEAD4] font-label-sm text-label-sm font-semibold">You</span>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-on-surface text-[18px]" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+<!-- Meta Pills Row -->
+<div class="pt-2 pb-1 flex flex-wrap gap-2">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.05] border border-white/[0.1] text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]" data-icon="tag">tag</span>
+<span class="text-on-surface">#TP-092</span>
+</div>
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.05] border border-white/[0.1] text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px] text-primary" data-icon="bolt">bolt</span>
+<span>Sprint 24</span>
+</div>
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.05] border border-white/[0.1] text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px] text-[#7DD3FC]" data-icon="checklist">checklist</span>
+<span>Subtasks 6/8</span>
+</div>
+</div>
+<!-- Description Block -->
+<div class="pt-2">
+<div class="flex items-center justify-between mb-2">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Description</label>
+<button class="font-label-sm text-label-sm text-primary hover:text-primary-container flex items-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[14px]" data-icon="edit">edit</span>
+              Edit
+            </button>
+</div>
+<div class="p-4 rounded-2xl bg-white/[0.05] border border-white/[0.1] backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
+<p class="font-body-md text-body-md text-[#E6E9F2] leading-relaxed">
+              Let users update their display name, email preferences and time zone.
+            </p>
+</div>
+</div>
+</div>
+<!-- SEPARATOR -->
+<div class="h-px bg-white/[0.08] w-full"></div>
+<!-- COMMENTS SECTION -->
+<section class="space-y-4">
+<!-- Header -->
+<div class="flex items-center justify-between">
+<h3 class="font-headline-md text-headline-md font-semibold text-white tracking-tight">Comments · 4</h3>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Oldest first</span>
+</div>
+<!-- Chronological Comment Stream -->
+<div class="space-y-4 pt-1">
+<!-- Comment 1: Alex Morgan -->
+<article class="flex gap-3 items-start">
+<div class="w-8 h-8 rounded-full bg-[#C4B5FD] text-[#3c0091] font-bold text-xs flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(196,181,253,0.3)]">
+              AM
+            </div>
+<div class="flex-1 space-y-1">
+<div class="flex items-baseline justify-between">
+<span class="font-label-lg text-label-lg font-semibold text-on-surface">Alex Morgan</span>
+<time class="font-body-sm text-body-sm text-[#A3ACC2]">Oct 9, 10:14</time>
+</div>
+<div class="p-3.5 rounded-2xl bg-white/[0.06] border border-white/[0.1] backdrop-blur-md">
+<p class="font-body-md text-body-md text-[#E6E9F2]">
+                  Please match the layout of the billing settings page.
+                </p>
+</div>
+</div>
+</article>
+<!-- Comment 2: Riley Chen -->
+<article class="flex gap-3 items-start">
+<div class="w-8 h-8 rounded-full bg-[#FDBA74] text-[#690005] font-bold text-xs flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(253,186,116,0.3)]">
+              RC
+            </div>
+<div class="flex-1 space-y-1">
+<div class="flex items-baseline justify-between">
+<span class="font-label-lg text-label-lg font-semibold text-on-surface">Riley Chen</span>
+<time class="font-body-sm text-body-sm text-[#A3ACC2]">Oct 9, 15:40</time>
+</div>
+<div class="p-3.5 rounded-2xl bg-white/[0.06] border border-white/[0.1] backdrop-blur-md">
+<p class="font-body-md text-body-md text-[#E6E9F2]">
+                  Time zone list is ready in the shared components.
+                </p>
+</div>
+</div>
+</article>
+<!-- Comment 3: Sam Lee (You) with Actions -->
+<article class="flex gap-3 items-start">
+<div class="w-8 h-8 rounded-full bg-[#5EEAD4] text-[#0B1020] font-bold text-xs flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(94,234,212,0.4)] ring-1 ring-white/30">
+              SL
+            </div>
+<div class="flex-1 space-y-1">
+<div class="flex items-baseline justify-between">
+<div class="flex items-center gap-2">
+<span class="font-label-lg text-label-lg font-semibold text-on-surface">Sam Lee <span class="font-normal text-on-surface-variant text-xs">(you)</span></span>
+<span class="text-[10px] text-on-surface-variant bg-white/[0.06] px-1.5 py-0.2 rounded">edited</span>
+</div>
+<time class="font-body-sm text-body-sm text-[#A3ACC2]">Oct 10, 09:02</time>
+</div>
+<!-- Frosted glass bubble with subtle teal highlight -->
+<div class="p-3.5 rounded-2xl bg-white/[0.09] border-2 border-primary-container shadow-[0_0_16px_rgba(94,234,212,0.35)] backdrop-blur-md"><textarea class="w-full bg-transparent border-0 p-0 text-on-surface font-body-md text-body-md focus:ring-0 focus:outline-none resize-none leading-relaxed" rows="2">Started on the form; validation and time zone picker next.</textarea><div class="mt-3 pt-2.5 border-t border-white/[0.08] flex items-center justify-between"><span class="text-xs text-secondary font-mono">57 / 2000</span><div class="flex items-center gap-2"><button class="px-3 py-1 rounded-full text-on-surface-variant hover:text-white font-label-sm text-label-sm transition-colors">Cancel</button><button class="px-4 py-1 rounded-full bg-[#5EEAD4] hover:bg-[#2DD4BF] text-[#0B1020] font-label-sm text-label-sm font-bold shadow-[0_0_12px_rgba(94,234,212,0.4)] transition-all active:scale-95">Save</button></div></div></div>
+</div>
+</article><article class="flex gap-3 items-start"><div class="w-8 h-8 rounded-full bg-[#8B5CF6]/15 text-[#C4B5FD] font-bold text-xs flex items-center justify-center shrink-0 border border-[#8B5CF6]/15 shadow-[0_0_10px_rgba(196,181,253,0.3)]">JP</div><div class="flex-1 space-y-1"><div class="flex items-baseline justify-between"><span class="font-label-lg text-label-lg font-semibold text-on-surface">Jordan Patel</span><time class="font-body-sm text-body-sm text-[#A3ACC2]">Oct 10, 11:20</time></div><div class="p-3.5 rounded-2xl bg-white/[0.06] border border-white/[0.1] backdrop-blur-md"><p class="font-body-md text-body-md text-[#E6E9F2]">Can we keep the &lt;b&gt;Save&lt;/b&gt; button sticky?</p></div></div></article>
+</div>
+</section>
+</div>
+<!-- BOTTOM PINNED COMPOSER -->
+<div class="mx-6 mb-2 p-3.5 rounded-2xl bg-[#0e1323]/90 border border-error/30 backdrop-blur-xl shadow-lg flex items-center justify-between gap-3 animate-in"><div class="flex items-center gap-2.5 text-body-sm text-[#E6E9F2]"><div class="w-7 h-7 rounded-full bg-error-container/80 text-error flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[16px]" data-icon="delete">delete</span></div><span class="font-body-sm">Delete this comment? This can't be undone.</span></div><div class="flex items-center gap-2 shrink-0"><button class="px-3 py-1 rounded-full text-on-surface-variant hover:text-white font-label-sm text-label-sm transition-colors">Cancel</button><button class="px-3 py-1 rounded-full bg-error-container text-[#ffdad6] hover:bg-error hover:text-[#690005] font-label-sm text-label-sm font-semibold transition-all shadow-[0_0_8px_rgba(255,180,171,0.3)] active:scale-95">Delete</button></div></div><div class="p-5 border-t border-white/[0.12] bg-surface-container-high/80 backdrop-blur-2xl shrink-0">
+<div class="relative rounded-2xl bg-white/[0.04] border border-white/[0.12] focus-within:border-primary-container focus-within:ring-2 focus-within:ring-primary-container/20 transition-all p-3">
+<textarea class="w-full bg-transparent border-0 p-0 text-on-surface placeholder:text-on-surface-variant/60 font-body-md text-body-md focus:ring-0 focus:outline-none resize-none leading-relaxed" placeholder="Add a comment…" rows="2"></textarea>
+<div class="mt-3 flex items-center justify-between pt-2 border-t border-white/[0.06]">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<button class="p-1 hover:text-on-surface transition-colors rounded" title="Attach file">
+<span class="material-symbols-outlined text-[18px]" data-icon="attach_file">attach_file</span>
+</button>
+<button class="p-1 hover:text-on-surface transition-colors rounded" title="Mention someone">
+<span class="material-symbols-outlined text-[18px]" data-icon="alternate_email">alternate_email</span>
+</button>
+<span class="text-xs text-secondary ml-2 font-mono">0 / 2000</span>
+</div>
+<button class="px-5 py-2 rounded-full bg-[#5EEAD4] text-[#0B1020] font-label-lg text-label-lg font-semibold hover:bg-[#2DD4BF] shadow-[0_0_16px_rgba(94,234,212,0.3)] transition-all active:scale-95 flex items-center gap-1.5">
+<span>Post</span>
+<span class="material-symbols-outlined text-[16px] font-bold" data-icon="send">send</span>
+</button>
+</div>
+</div>
+</div>
+</aside>
+</body></html>
