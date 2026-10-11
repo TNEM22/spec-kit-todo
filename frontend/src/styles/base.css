@@ -1,0 +1,179 @@
+/* Self-hosted fonts: Plus Jakarta Sans (text) and Material Symbols Outlined (icons, weight 300). */
+@import '@fontsource/plus-jakarta-sans/400.css';
+@import '@fontsource/plus-jakarta-sans/500.css';
+@import '@fontsource/plus-jakarta-sans/600.css';
+@import '@fontsource/plus-jakarta-sans/700.css';
+@import 'material-symbols/outlined.css';
+@import '@angular/cdk/overlay-prebuilt.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--tf-canvas);
+  color: var(--tf-text);
+  font-family: var(--tf-font);
+  font-size: var(--tf-fs-body-md);
+  line-height: var(--tf-lh-body-md);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Dark mode only: no light theme is provided. */
+:root {
+  color-scheme: dark;
+}
+
+/* The app is designed for desktop windows 1024px and wider; narrower windows scroll (FR-025). */
+app-root {
+  display: block;
+  min-width: 1024px;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 300,
+    'GRAD' 0,
+    'opsz' 20;
+  line-height: 1;
+  display: inline-block;
+  vertical-align: middle;
+  user-select: none;
+}
+
+/* Visible keyboard focus: a 2px teal ring with a 2px gap, never only a color change (FR-025). */
+:focus-visible {
+  outline: 2px solid var(--tf-accent);
+  outline-offset: 2px;
+}
+
+/* Text that screen readers read but sighted users do not need, e.g. the "Unread" label. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Primary and secondary buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tf-space-sm);
+  border: 1px solid transparent;
+  border-radius: var(--tf-radius-pill);
+  padding: 10px 20px;
+  font-size: var(--tf-fs-label-lg);
+  line-height: var(--tf-lh-label-lg);
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    box-shadow var(--tf-motion),
+    background var(--tf-motion);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--tf-accent);
+  color: var(--tf-accent-on);
+  box-shadow: var(--tf-glow-accent);
+}
+
+.btn-primary:hover:not(:disabled) {
+  box-shadow: 0 0 22px rgb(94 234 212 / 0.5);
+}
+
+.btn-ghost {
+  background: var(--tf-glass-subtle-fill);
+  border-color: var(--tf-glass-card-border);
+  color: var(--tf-text);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--tf-glass-hover-fill);
+}
+
+.btn-danger {
+  background: transparent;
+  border-color: var(--tf-error-border);
+  color: var(--tf-error);
+}
+
+.link-button {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--tf-accent-2);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Reduced motion: no decorative motion (card tilt, shimmer, transitions) when the OS asks (FR-025). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* The tilt uses the separate `rotate` property; the CDK positions cards with `transform`. */
+  .cdk-drag-preview {
+    rotate: none !important;
+  }
+}
+
+/* Dimmed, lightly blurred backdrop behind popovers and dialogs. */
+.tf-scrim {
+  background: rgb(8 12 24 / 0.55);
+  backdrop-filter: blur(2px);
+}
+/* Drag and drop: the card in the air is tilted and lifted; its slot is a dashed teal drop zone. */
+.cdk-drag-preview {
+  rotate: 2deg;
+  box-shadow: var(--tf-shadow-raised), 0 0 0 1px rgb(94 234 212 / 0.3);
+  border-radius: var(--tf-radius-card);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.4;
+  border: 2px dashed var(--tf-accent);
+  border-radius: var(--tf-radius-card);
+}
+
+.cdk-drag-animating {
+  transition: transform 220ms cubic-bezier(0, 0, 0.2, 1);
+}

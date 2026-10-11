@@ -1,0 +1,118 @@
+/*
+ * Design tokens from specs/001-taskify-kanban-board/design/tokens.md (the Stitch "Nocturne Glass"
+ * export). Components use these variables; no hard-coded colors, radii or shadows in components.
+ */
+:root {
+  /* Colors: app palette */
+  --tf-canvas: #0b1020;
+  --tf-accent: #5eead4;
+  --tf-accent-on: #0b1020;
+  --tf-accent-2: #a5b4fc;
+  --tf-text: #e6e9f2;
+  --tf-text-2: #a3acc2;
+  --tf-aurora-teal: #2dd4bf;
+  --tf-aurora-indigo: #6366f1;
+  --tf-aurora-violet: #8b5cf6;
+
+  /* Status colors (one per board column) */
+  --tf-status-todo: #94a3b8;
+  --tf-status-in-progress: #7dd3fc;
+  --tf-status-in-review: #fcd34d;
+  --tf-status-done: #86efac;
+
+  /* Feedback */
+  --tf-error: #fca5a5;
+  --tf-error-border: #f87171;
+  --tf-success: #86efac;
+  --tf-warning: #fcd34d;
+
+  /* Avatar colors (the API also sends each user's color) */
+  --tf-avatar-alex: #c4b5fd;
+  --tf-avatar-sam: #5eead4;
+  --tf-avatar-jordan: #f9a8d4;
+  --tf-avatar-riley: #fdba74;
+  --tf-avatar-taylor: #93c5fd;
+
+  /* Solid fallbacks when backdrop-filter is unavailable */
+  --tf-surface: #161b2b;
+  --tf-surface-high: #25293a;
+
+  /* Glass layers: fill, border, blur */
+  --tf-glass-lane-fill: rgb(255 255 255 / 0.04);
+  --tf-glass-lane-border: rgb(255 255 255 / 0.08);
+  --tf-glass-lane-blur: 24px;
+  --tf-glass-card-fill: rgb(255 255 255 / 0.08);
+  --tf-glass-card-border: rgb(255 255 255 / 0.14);
+  --tf-glass-card-blur: 16px;
+  --tf-glass-subtle-fill: rgb(255 255 255 / 0.06);
+  --tf-glass-subtle-border: rgb(255 255 255 / 0.1);
+  --tf-glass-subtle-blur: 16px;
+  --tf-glass-overlay-fill: rgb(255 255 255 / 0.12);
+  --tf-glass-overlay-border: rgb(255 255 255 / 0.22);
+  --tf-glass-overlay-blur: 32px;
+  --tf-glass-hover-fill: rgb(255 255 255 / 0.14);
+  --tf-glass-hover-border: rgb(255 255 255 / 0.22);
+  --tf-input-fill: rgb(255 255 255 / 0.05);
+  --tf-input-border: rgb(255 255 255 / 0.12);
+
+  /* Shadows and glows */
+  --tf-shadow-card: 0 8px 24px -4px rgb(0 0 0 / 0.35);
+  --tf-shadow-panel: 0 8px 32px 0 rgb(0 0 0 / 0.37);
+  --tf-shadow-overlay: 0 20px 48px -8px rgb(0 0 0 / 0.6);
+  --tf-shadow-raised: 0 12px 28px -4px rgb(0 0 0 / 0.4), inset 0 1px 0 0 rgb(255 255 255 / 0.22);
+  --tf-shadow-inset-top: inset 0 1px 0 0 rgb(255 255 255 / 0.2);
+  --tf-glow-accent: 0 0 16px rgb(94 234 212 / 0.35);
+  --tf-glow-accent-sm: 0 0 8px rgb(94 234 212 / 0.4);
+  --tf-ring-focus: 0 0 0 3px rgb(94 234 212 / 0.15);
+
+  /* Notifications (tokens.md "Notifications") */
+  --tf-badge-bg: var(--tf-accent);
+  --tf-badge-text: var(--tf-accent-on);
+  --tf-badge-glow: 0 0 10px rgb(94 234 212 / 0.3);
+  --tf-unread-dot: var(--tf-accent);
+  --tf-unread-dot-glow: 0 0 8px rgb(94 234 212 / 0.6);
+  --tf-panel-shadow: 0 20px 50px rgb(0 0 0 / 0.8), 0 0 24px rgb(94 234 212 / 0.12);
+  --tf-panel-width: 400px;
+
+  /* Radii */
+  --tf-radius-pill: 9999px;
+  --tf-radius-lane: 20px;
+  --tf-radius-card: 16px;
+  --tf-radius-overlay: 24px;
+  --tf-radius-input: 12px;
+
+  /* Spacing */
+  --tf-space-xs: 4px;
+  --tf-space-sm: 8px;
+  --tf-space-md: 16px;
+  --tf-space-lg: 20px;
+  --tf-space-xl: 28px;
+  --tf-space-2xl: 32px;
+  --tf-gutter: 20px;
+  --tf-lane-min: 300px;
+  --tf-lane-max: 380px;
+
+  /* Typography */
+  --tf-font: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --tf-fs-headline-xl: 32px;
+  --tf-lh-headline-xl: 40px;
+  --tf-fs-headline-lg: 24px;
+  --tf-lh-headline-lg: 32px;
+  --tf-fs-headline-md: 18px;
+  --tf-lh-headline-md: 24px;
+  --tf-fs-body-lg: 16px;
+  --tf-lh-body-lg: 24px;
+  --tf-fs-body-md: 14px;
+  --tf-lh-body-md: 20px;
+  --tf-fs-body-sm: 12px;
+  --tf-lh-body-sm: 16px;
+  --tf-fs-label-lg: 14px;
+  --tf-lh-label-lg: 18px;
+  --tf-fs-label-md: 12px;
+  --tf-lh-label-md: 16px;
+  --tf-fs-label-sm: 11px;
+  --tf-lh-label-sm: 14px;
+
+  /* Motion */
+  --tf-motion: 160ms ease;
+}

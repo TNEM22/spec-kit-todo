@@ -1,0 +1,5 @@
+{
+  "$schema": "node_modules/ng-openapi-gen/ng-openapi-gen-schema.json",
+  "input": "src/app/core/api/openapi.json",
+  "output": "src/app/core/api/generated"
+}

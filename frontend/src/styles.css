@@ -1,0 +1,4 @@
+/* Global styles: design tokens, glass surfaces and base rules. */
+@import './styles/tokens.css';
+@import './styles/glass.css';
+@import './styles/base.css';

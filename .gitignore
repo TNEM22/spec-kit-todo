@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+backend/.venv/
+backend/.env
+backend/taskify.db*
+backend/test*.db*
+backend/.pytest_cache/
+backend/.ruff_cache/
+backend/.mypy_cache/
+*.egg-info/
+
+# Node / Angular
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+*.log
+
+# Environment and OS
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.tmp
+*.swp

@@ -1,0 +1,38 @@
+[project]
+name = "taskify-backend"
+version = "0.1.0"
+description = "Taskify backend: FastAPI modular monolith"
+requires-python = ">=3.12,<3.13"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+# The slower timing checks run only on request: pytest -m perf
+addopts = "-m 'not perf'"
+markers = ["perf: performance tests (200-task board, five WebSocket clients)"]
+filterwarnings = [
+    # Starlette's test client works with httpx; the notice only suggests a future replacement.
+    "ignore:Using `httpx` with `starlette.testclient` is deprecated",
+]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+
+[tool.ruff.lint]
+# D100-D103: every public module, class, method and function needs a docstring (Constitution IV).
+select = ["E", "F", "I", "UP", "B", "D100", "D101", "D102", "D103"]
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI's dependency injection idiom: Depends(...) in argument defaults.
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["D100", "D101", "D102", "D103"]
+"alembic/**" = ["D100", "D103"]
+"alembic/versions/*" = ["E501", "UP007"]
+
+[tool.mypy]
+python_version = "3.12"
+plugins = ["pydantic.mypy"]
+ignore_missing_imports = true

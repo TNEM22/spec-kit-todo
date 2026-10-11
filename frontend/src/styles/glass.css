@@ -1,0 +1,72 @@
+/*
+ * Glass surfaces (fluid glass, dark mode only). Text always sits on glass dense enough for
+ * WCAG AA contrast; the accessibility pass (tasks T101) verifies it on the rendered background.
+ */
+.glass-lane {
+  background: var(--tf-surface);
+  border: 1px solid var(--tf-glass-lane-border);
+  border-radius: var(--tf-radius-lane);
+}
+
+.glass-card {
+  background: var(--tf-surface);
+  border: 1px solid var(--tf-glass-card-border);
+  border-radius: var(--tf-radius-card);
+  box-shadow: var(--tf-shadow-card), var(--tf-shadow-inset-top);
+}
+
+.glass-subtle {
+  background: var(--tf-surface);
+  border: 1px solid var(--tf-glass-subtle-border);
+}
+
+.glass-overlay {
+  background: var(--tf-surface-high);
+  border: 1px solid var(--tf-glass-overlay-border);
+  border-radius: var(--tf-radius-overlay);
+  box-shadow: var(--tf-shadow-overlay);
+}
+
+.glass-panel-popover {
+  width: var(--tf-panel-width);
+  max-width: calc(100vw - 1.5rem);
+  box-shadow: var(--tf-panel-shadow);
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .glass-lane {
+    background: var(--tf-glass-lane-fill);
+    backdrop-filter: blur(var(--tf-glass-lane-blur));
+    -webkit-backdrop-filter: blur(var(--tf-glass-lane-blur));
+  }
+
+  .glass-card {
+    background: var(--tf-glass-card-fill);
+    backdrop-filter: blur(var(--tf-glass-card-blur));
+    -webkit-backdrop-filter: blur(var(--tf-glass-card-blur));
+  }
+
+  .glass-subtle {
+    background: var(--tf-glass-subtle-fill);
+    backdrop-filter: blur(var(--tf-glass-subtle-blur));
+    -webkit-backdrop-filter: blur(var(--tf-glass-subtle-blur));
+  }
+
+  .glass-overlay {
+    background: var(--tf-glass-overlay-fill);
+    backdrop-filter: blur(var(--tf-glass-overlay-blur));
+    -webkit-backdrop-filter: blur(var(--tf-glass-overlay-blur));
+  }
+}
+
+.glass-hoverable {
+  transition:
+    transform var(--tf-motion),
+    border-color var(--tf-motion),
+    background var(--tf-motion);
+}
+
+.glass-hoverable:hover {
+  transform: translateY(-2px);
+  border-color: var(--tf-glass-hover-border);
+}
