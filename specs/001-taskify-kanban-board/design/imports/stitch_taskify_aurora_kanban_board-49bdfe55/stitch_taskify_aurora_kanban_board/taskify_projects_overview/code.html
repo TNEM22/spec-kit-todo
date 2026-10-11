@@ -1,0 +1,459 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Taskify - Projects</title>
+<!-- Google Font: Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "outline-variant": "#3c4946",
+            "on-error-container": "#ffdad6",
+            "primary-container": "#5eead4",
+            "on-secondary": "#1000a9",
+            "tertiary": "#f6eeff",
+            "surface-variant": "#2f3446",
+            "on-tertiary-fixed-variant": "#5516be",
+            "on-tertiary": "#3c0091",
+            "on-error": "#690005",
+            "on-primary-fixed-variant": "#005047",
+            "inverse-surface": "#dee1f9",
+            "secondary-fixed": "#e1e0ff",
+            "surface-container": "#1a1f30",
+            "on-tertiary-fixed": "#23005c",
+            "tertiary-container": "#ddcdff",
+            "surface-container-high": "#25293a",
+            "background": "#0e1323",
+            "error-container": "#93000a",
+            "primary-fixed-dim": "#4ddcc6",
+            "inverse-on-surface": "#2b3041",
+            "surface-container-highest": "#2f3446",
+            "inverse-primary": "#006b5e",
+            "on-secondary-fixed-variant": "#2f2ebe",
+            "surface-bright": "#34394a",
+            "on-secondary-container": "#b0b2ff",
+            "on-primary": "#003730",
+            "secondary": "#c0c1ff",
+            "secondary-fixed-dim": "#c0c1ff",
+            "on-primary-container": "#00675b",
+            "primary-fixed": "#6ef9e2",
+            "secondary-container": "#3131c0",
+            "on-primary-fixed": "#00201b",
+            "on-surface": "#dee1f9",
+            "surface-dim": "#0e1323",
+            "surface-tint": "#4ddcc6",
+            "on-background": "#dee1f9",
+            "outline": "#859490",
+            "surface-container-lowest": "#080d1d",
+            "tertiary-fixed": "#e9ddff",
+            "on-surface-variant": "#bbcac5",
+            "primary": "#b5fff0",
+            "on-secondary-fixed": "#07006c",
+            "error": "#ffb4ab",
+            "surface-container-low": "#161b2b",
+            "tertiary-fixed-dim": "#d0bcff",
+            "surface": "#0e1323",
+            "on-tertiary-container": "#6b37d4"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "2xl": "1.25rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-xl": "1.75rem",
+            "space-sm": "0.5rem",
+            "gutter": "1.25rem",
+            "space-lg": "1.25rem",
+            "margin": "2rem",
+            "space-md": "1rem",
+            "space-xs": "0.25rem"
+          },
+          "fontFamily": {
+            "body-md": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"],
+            "headline-xl": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500" }],
+            "label-lg": ["14px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "headline-md": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      background-color: #0B1020;
+      color: #E6E9F2;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+    }
+    .glass-surface {
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.18), 0 8px 32px -4px rgba(0, 0, 0, 0.35);
+    }
+    .glass-surface-hover-active {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(94, 234, 212, 0.38);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.28), 0 16px 40px -4px rgba(45, 212, 191, 0.24);
+      transform: translateY(-3px);
+    }
+    .glass-nav {
+      background: rgba(14, 19, 35, 0.72);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.35);
+    }
+  </style>
+</head>
+<body class="min-h-screen relative flex flex-col justify-between selection:bg-primary-container selection:text-on-primary-container">
+<!-- Atmospheric Background Ambient Auroras -->
+<div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+<!-- Teal Aurora Sphere -->
+<div class="absolute -top-32 left-1/4 w-[520px] h-[520px] rounded-full bg-[#2DD4BF]/15 blur-[140px]"></div>
+<!-- Indigo Aurora Sphere -->
+<div class="absolute top-1/3 -right-24 w-[600px] h-[600px] rounded-full bg-[#6366F1]/12 blur-[150px]"></div>
+<!-- Violet Aurora Sphere -->
+<div class="absolute -bottom-36 left-12 w-[580px] h-[580px] rounded-full bg-[#8B5CF6]/14 blur-[140px]"></div>
+<!-- Central Gentle Highlight -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] rounded-full bg-[#2DD4BF]/05 blur-[160px]"></div>
+</div>
+<!-- Primary Application Wrapper -->
+<div class="relative z-10 flex flex-col min-h-screen">
+<!-- Top Navigation Bar (Shared Component Style Mirror) -->
+<header class="sticky top-0 z-50 w-full h-16 px-6 flex justify-between items-center border-b border-white/10 bg-[#0B1020]/80 backdrop-blur-md transition-all duration-200"><div class="flex items-center gap-6"><a class="flex items-center gap-2.5 group" href="#"><div class="w-8 h-8 rounded-xl bg-gradient-to-br from-[#5EEAD4] to-[#6366F1] flex items-center justify-center shadow-[0_0_16px_rgba(94,234,212,0.45)] group-hover:shadow-[0_0_22px_rgba(94,234,230,0.65)] transition-all"><span class="material-symbols-outlined text-[#0B1020] text-xl" data-icon="space_dashboard" style="font-variation-settings: 'FILL' 1;">space_dashboard</span></div><span class="font-headline-lg font-bold text-lg text-white group-hover:text-white transition-colors">Taskify</span></a><span class="text-outline-variant/60 font-thin text-lg">/</span><div class="flex items-center gap-2 text-sm font-medium"><span class="text-[#E6E9F2] font-semibold tracking-wide flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08]"><span class="w-1.5 h-1.5 rounded-full bg-[#5EEAD4] shadow-[0_0_6px_#5EEAD4]"></span>Projects</span></div></div><div class="hidden lg:flex items-center w-80 relative"><span class="material-symbols-outlined absolute left-3.5 text-on-surface-variant/70 text-lg" data-icon="search">search</span><input class="w-full pl-10 pr-4 py-1.5 rounded-full bg-white/[0.05] border border-white/[0.12] text-xs font-body-sm text-[#E6E9F2] placeholder-on-surface-variant/60 focus:outline-none focus:border-[#5EEAD4] focus:ring-2 focus:ring-[#5EEAD4]/20 transition-all backdrop-blur-md" placeholder="Search projects or tags..." type="text"><kbd class="absolute right-3 text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-white/[0.08] text-on-surface-variant/80 border border-white/10">⌘K</kbd></div><div class="flex items-center gap-4"><div class="hidden sm:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/[0.05] border border-white/[0.1] backdrop-blur-md shadow-sm"><div class="w-6 h-6 rounded-full bg-[#5EEAD4] text-[#0B1020] font-bold text-xs flex items-center justify-center shadow-[0_0_10px_rgba(94,234,212,0.5)]">SL</div><span class="font-body-sm text-body-sm font-medium text-[#E6E9F2] tracking-normal">Sam Lee <span class="text-on-surface-variant/60 mx-0.5">·</span> <span class="text-on-surface-variant">Engineer</span></span><span class="w-px h-3.5 bg-white/15"></span><button class="font-label-sm text-label-sm text-[#A5B4FC] hover:text-white transition-colors cursor-pointer active:scale-95 duration-150">Switch user</button></div><button aria-label="Notifications" class="w-9 h-9 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.12] text-[#E6E9F2] flex items-center justify-center transition-all duration-200 active:scale-95 shadow-sm cursor-pointer"><span class="material-symbols-outlined text-lg" data-icon="notifications">notifications</span></button></div></header>
+<!-- Main Content Canvas -->
+<main class="flex-1 max-w-[1400px] w-full mx-auto px-8 py-10 flex flex-col gap-8">
+<!-- Page Header Section -->
+<section class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-3">
+<h1 class="font-headline-xl text-headline-xl font-bold tracking-tight text-[#E6E9F2]">Projects</h1>
+<span class="px-2.5 py-0.5 rounded-full bg-white/[0.06] border border-white/[0.1] text-xs font-medium text-on-surface-variant tracking-wide">
+              3 active
+            </span>
+</div>
+<p class="font-body-md text-body-md text-[#A3ACC2]">3 projects across your core architecture workspace.</p>
+</div>
+<!-- Action Control Cluster -->
+<div class="flex items-center gap-3">
+<!-- Glass Filter Pill -->
+<button class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.12] text-xs font-label-lg font-semibold text-[#E6E9F2] transition-all duration-150 active:scale-98">
+<span class="material-symbols-outlined text-sm" data-icon="tune">tune</span>
+            Filter
+          </button>
+<!-- Primary CTA Button with Luminous Glow -->
+<button class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#5EEAD4] hover:bg-[#6ef9e2] text-[#0B1020] font-label-lg text-label-lg font-bold shadow-[0_0_20px_rgba(94,234,212,0.38)] hover:shadow-[0_0_28px_rgba(94,234,212,0.55)] transition-all duration-200 active:scale-[0.97] cursor-pointer">
+<span class="material-symbols-outlined text-base font-bold" data-icon="add">add</span>
+            New project
+          </button>
+</div>
+</section>
+<!-- Project Cards Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+<!-- Card 1: Customer Portal (ACTIVE HOVER STATE) -->
+<div class="glass-surface-hover-active rounded-2xl p-6 flex flex-col justify-between transition-all duration-300 relative group cursor-pointer overflow-hidden">
+<!-- Subtle Top Edge Light Catcher -->
+<div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#5EEAD4]/60 to-transparent"></div>
+<div class="flex flex-col gap-4">
+<!-- Card Header: Title & Assigned Badge -->
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-center gap-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#5EEAD4] shadow-[0_0_8px_#5EEAD4] animate-pulse"></span>
+<h2 class="font-headline-md text-headline-md font-bold text-[#FFFFFF] tracking-tight">Customer Portal</h2>
+</div>
+<!-- Assigned Badge -->
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#5EEAD4]/15 border border-[#5EEAD4]/30 text-[11px] font-label-sm font-semibold text-[#5EEAD4] shadow-[0_0_12px_rgba(94,234,212,0.18)]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#5EEAD4]"></span>
+                2 assigned to you
+              </span>
+</div>
+<!-- Description -->
+<p class="font-body-md text-body-md text-[#CBD5E1] leading-relaxed">
+              Self-service portal where customers manage accounts and invoices.
+            </p>
+<!-- Segmented Progress Bar (8 Tasks: 25% each) -->
+<div class="flex flex-col gap-2.5 pt-2">
+<div class="flex justify-between items-center text-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Task Velocity</span>
+<span class="font-label-sm text-label-sm text-[#E6E9F2] font-semibold">8 total</span>
+</div>
+<div class="w-full h-2 rounded-full bg-white/[0.08] overflow-hidden flex gap-0.5 p-0.5 border border-white/[0.06]">
+<div class="h-full rounded-l-full bg-[#94A3B8]" style="width: 25%" title="To Do: 2 tasks (25%)"></div>
+<div class="h-full bg-[#7DD3FC]" style="width: 25%" title="In Progress: 2 tasks (25%)"></div>
+<div class="h-full bg-[#FCD34D]" style="width: 25%" title="In Review: 2 tasks (25%)"></div>
+<div class="h-full rounded-r-full bg-[#86EFAC]" style="width: 25%" title="Done: 2 tasks (25%)"></div>
+</div>
+<!-- Breakdown Pill Row -->
+<div class="grid grid-cols-4 gap-1 pt-1.5">
+<div class="flex items-center gap-1.5 text-[11px] font-label-sm text-[#CBD5E1]">
+<span class="w-2 h-2 rounded-full bg-[#94A3B8]"></span>
+<span class="">2 To Do</span>
+</div>
+<div class="flex items-center gap-1.5 text-[11px] font-label-sm text-[#CBD5E1]">
+<span class="w-2 h-2 rounded-full bg-[#7DD3FC]"></span>
+<span class="">2 Active</span>
+</div>
+<div class="flex items-center gap-1.5 text-[11px] font-label-sm text-[#CBD5E1]">
+<span class="w-2 h-2 rounded-full bg-[#FCD34D]"></span>
+<span class="">2 Review</span>
+</div>
+<div class="flex items-center gap-1.5 text-[11px] font-label-sm text-[#CBD5E1]">
+<span class="w-2 h-2 rounded-full bg-[#86EFAC]"></span>
+<span class="">2 Done</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card Footer Area -->
+<div class="pt-6 mt-6 border-t border-white/[0.1] flex items-center justify-between">
+<!-- Overlapping Assignee Avatars (SL, TB, RC, JP, AM) -->
+<div class="flex items-center -space-x-2 overflow-hidden py-1">
+<div class="w-7 h-7 rounded-full bg-[#5EEAD4] text-[#0B1020] text-[10px] font-bold flex items-center justify-center ring-2 ring-[#0E1323] shadow-sm z-50">SL</div>
+<div class="w-7 h-7 rounded-full bg-[#818CF8] text-[#0B1020] text-[10px] font-bold flex items-center justify-center ring-2 ring-[#0E1323] shadow-sm z-40">TB</div>
+<div class="w-7 h-7 rounded-full bg-[#F472B6] text-[#0B1020] text-[10px] font-bold flex items-center justify-center ring-2 ring-[#0E1323] shadow-sm z-30">RC</div>
+<div class="w-7 h-7 rounded-full bg-[#38BDF8] text-[#0B1020] text-[10px] font-bold flex items-center justify-center ring-2 ring-[#0E1323] shadow-sm z-20">JP</div>
+<div class="w-7 h-7 rounded-full bg-[#A78BFA] text-[#0B1020] text-[10px] font-bold flex items-center justify-center ring-2 ring-[#0E1323] shadow-sm z-10">AM</div>
+</div>
+<!-- Open Board Link -->
+<a class="inline-flex items-center gap-1.5 text-xs font-label-lg font-semibold text-[#A5B4FC] hover:text-[#5EEAD4] group-hover:translate-x-0.5 transition-all duration-200" href="#">
+              Open board <span class="transition-transform group-hover:translate-x-1 duration-150">→</span>
+</a>
+</div>
+</div>
+<!-- Card 2: Billing Revamp -->
+<div class="glass-surface hover:bg-white/[0.1] hover:border-white/[0.22] rounded-2xl p-6 flex flex-col justify-between transition-all duration-200 relative group cursor-pointer hover:-translate-y-1 hover:shadow-[0_12px_32px_-4px_rgba(0,0,0,0.5)]">
+<div class="flex flex-col gap-4">
+<!-- Card Header -->
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-center gap-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-white/40"></span>
+<h2 class="font-headline-md text-headline-md font-bold text-[#E6E9F2] group-hover:text-white tracking-tight">Billing Revamp</h2>
+</div>
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-white/[0.05] border border-white/[0.08] text-[11px] font-label-sm font-medium text-on-surface-variant">
+                Sprint 4
+              </span>
+</div>
+<!-- Description -->
+<p class="font-body-md text-body-md text-[#A3ACC2] leading-relaxed">
+              Simplify invoicing and payment reminders.
+            </p>
+<!-- Segmented Progress Bar (9 Tasks: 4, 1, 1, 3) -->
+<div class="flex flex-col gap-2.5 pt-2">
+<div class="flex justify-between items-center text-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Task Velocity</span>
+<span class="font-label-sm text-label-sm text-[#E6E9F2] font-semibold">9 total</span>
+</div>
+<div class="w-full h-2 rounded-full bg-white/[0.08] overflow-hidden flex gap-0.5 p-0.5 border border-white/[0.06]">
+<div class="h-full rounded-l-full bg-[#94A3B8]" style="width: 44.4%" title="To Do: 4 tasks (~44%)"></div>
+<div class="h-full bg-[#7DD3FC]" style="width: 11.1%" title="In Progress: 1 task (~11%)"></div>
+<div class="h-full bg-[#FCD34D]" style="width: 11.1%" title="In Review: 1 task (~11%)"></div>
+<div class="h-full rounded-r-full bg-[#86EFAC]" style="width: 33.3%" title="Done: 3 tasks (~33%)"></div>
+</div>
+<!-- Breakdown Pill Row -->
+<div class="grid grid-cols-4 gap-1 pt-1.5">
+<div class="flex items-center gap-1.5 text-[11px] font-label-sm text-[#A3ACC2]">
+<span class="w-2 h-2 rounded-full bg-[#94A3B8]"></span>
+<span class="">4 To Do</span>
+</div>
+<div class="flex items-center gap-1.5 text-[11px] font-label-sm text-[#A3ACC2]">
+<span class="w-2 h-2 rounded-full bg-[#7DD3FC]"></span>
+<span class="">1 Active</span>
+</div>
+<div class="flex items-center gap-1.5 text-[11px] font-label-sm text-[#A3ACC2]">
+<span class="w-2 h-2 rounded-full bg-[#FCD34D]"></span>
+<span class="">1 Review</span>
+</div>
+<div class="flex items-center gap-1.5 text-[11px] font-label-sm text-[#A3ACC2]">
+<span class="w-2 h-2 rounded-full bg-[#86EFAC]"></span>
+<span class="">3 Done</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card Footer Area -->
+<div class="pt-6 mt-6 border-t border-white/[0.08] flex items-center justify-between">
+<!-- Overlapping Assignee Avatars (SL, RC, AM) -->
+<div class="flex items-center -space-x-2 overflow-hidden py-1">
+<div class="w-7 h-7 rounded-full bg-[#5EEAD4] text-[#0B1020] text-[10px] font-bold flex items-center justify-center ring-2 ring-[#0E1323] shadow-sm z-30">SL</div>
+<div class="w-7 h-7 rounded-full bg-[#F472B6] text-[#0B1020] text-[10px] font-bold flex items-center justify-center ring-2 ring-[#0E1323] shadow-sm z-20">RC</div>
+<div class="w-7 h-7 rounded-full bg-[#A78BFA] text-[#0B1020] text-[10px] font-bold flex items-center justify-center ring-2 ring-[#0E1323] shadow-sm z-10">AM</div>
+</div>
+<!-- Open Board Link -->
+<a class="inline-flex items-center gap-1.5 text-xs font-label-lg font-semibold text-[#A5B4FC] hover:text-[#5EEAD4] group-hover:translate-x-0.5 transition-all duration-200" href="#">
+              Open board <span class="transition-transform group-hover:translate-x-1 duration-150">→</span>
+</a>
+</div>
+</div>
+<!-- Card 3: Internal Tools -->
+<div class="glass-surface hover:bg-white/[0.1] hover:border-white/[0.22] rounded-2xl p-6 flex flex-col justify-between transition-all duration-200 relative group cursor-pointer hover:-translate-y-1 hover:shadow-[0_12px_32px_-4px_rgba(0,0,0,0.5)]">
+<div class="flex flex-col gap-4">
+<!-- Card Header -->
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-center gap-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-white/40"></span>
+<h2 class="font-headline-md text-headline-md font-bold text-[#E6E9F2] group-hover:text-white tracking-tight">Internal Tools</h2>
+</div>
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-white/[0.05] border border-white/[0.08] text-[11px] font-label-sm font-medium text-on-surface-variant">
+                Continuous
+              </span>
+</div>
+<!-- Description -->
+<p class="font-body-md text-body-md text-[#A3ACC2] leading-relaxed">
+              Small utilities that speed up the team's daily work.
+            </p>
+<!-- Segmented Progress Bar (8 Tasks: 2, 2, 0, 4) -->
+<div class="flex flex-col gap-2.5 pt-2">
+<div class="flex justify-between items-center text-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Task Velocity</span>
+<span class="font-label-sm text-label-sm text-[#E6E9F2] font-semibold">8 total</span>
+</div>
+<div class="w-full h-2 rounded-full bg-white/[0.08] overflow-hidden flex gap-0.5 p-0.5 border border-white/[0.06]">
+<div class="h-full rounded-l-full bg-[#94A3B8]" style="width: 25%" title="To Do: 2 tasks (25%)"></div>
+<div class="h-full bg-[#7DD3FC]" style="width: 25%" title="In Progress: 2 tasks (25%)"></div>
+<!-- In Review has 0 tasks, omitted or zero width -->
+<div class="h-full rounded-r-full bg-[#86EFAC]" style="width: 50%" title="Done: 4 tasks (50%)"></div>
+</div>
+<!-- Breakdown Pill Row -->
+<div class="grid grid-cols-4 gap-1 pt-1.5">
+<div class="flex items-center gap-1.5 text-[11px] font-label-sm text-[#A3ACC2]">
+<span class="w-2 h-2 rounded-full bg-[#94A3B8]"></span>
+<span class="">2 To Do</span>
+</div>
+<div class="flex items-center gap-1.5 text-[11px] font-label-sm text-[#A3ACC2]">
+<span class="w-2 h-2 rounded-full bg-[#7DD3FC]"></span>
+<span class="">2 Active</span>
+</div>
+<div class="flex items-center gap-1.5 text-[11px] font-label-sm text-on-surface-variant/40">
+<span class="w-2 h-2 rounded-full bg-[#FCD34D]/40"></span>
+<span class="">0 Review</span>
+</div>
+<div class="flex items-center gap-1.5 text-[11px] font-label-sm text-[#A3ACC2]">
+<span class="w-2 h-2 rounded-full bg-[#86EFAC]"></span>
+<span class="">4 Done</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card Footer Area -->
+<div class="pt-6 mt-6 border-t border-white/[0.08] flex items-center justify-between">
+<!-- Overlapping Assignee Avatars (JP, TB, SL) -->
+<div class="flex items-center -space-x-2 overflow-hidden py-1">
+<div class="w-7 h-7 rounded-full bg-[#38BDF8] text-[#0B1020] text-[10px] font-bold flex items-center justify-center ring-2 ring-[#0E1323] shadow-sm z-30">JP</div>
+<div class="w-7 h-7 rounded-full bg-[#818CF8] text-[#0B1020] text-[10px] font-bold flex items-center justify-center ring-2 ring-[#0E1323] shadow-sm z-20">TB</div>
+<div class="w-7 h-7 rounded-full bg-[#5EEAD4] text-[#0B1020] text-[10px] font-bold flex items-center justify-center ring-2 ring-[#0E1323] shadow-sm z-10">SL</div>
+</div>
+<!-- Open Board Link -->
+<a class="inline-flex items-center gap-1.5 text-xs font-label-lg font-semibold text-[#A5B4FC] hover:text-[#5EEAD4] group-hover:translate-x-0.5 transition-all duration-200" href="#">
+              Open board <span class="transition-transform group-hover:translate-x-1 duration-150">→</span>
+</a>
+</div>
+</div>
+</section>
+<!-- Asymmetric Workspace Metrics Bento Strip -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4">
+<div class="glass-surface rounded-xl p-4 flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-[#5EEAD4]/10 border border-[#5EEAD4]/20 flex items-center justify-center text-[#5EEAD4]">
+<span class="material-symbols-outlined text-xl" data-icon="splitscreen">splitscreen</span>
+</div>
+<div>
+<div class="text-[11px] font-label-sm text-[#A3ACC2] uppercase tracking-wider">Total Tasks</div>
+<div class="text-lg font-headline-md font-bold text-[#E6E9F2]">25 Managed</div>
+</div>
+</div>
+<div class="glass-surface rounded-xl p-4 flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-[#86EFAC]/10 border border-[#86EFAC]/20 flex items-center justify-center text-[#86EFAC]">
+<span class="material-symbols-outlined text-xl" data-icon="check_circle">check_circle</span>
+</div>
+<div>
+<div class="text-[11px] font-label-sm text-[#A3ACC2] uppercase tracking-wider">Completed</div>
+<div class="text-lg font-headline-md font-bold text-[#E6E9F2]">9 Delivered</div>
+</div>
+</div>
+<div class="glass-surface rounded-xl p-4 flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-[#7DD3FC]/10 border border-[#7DD3FC]/20 flex items-center justify-center text-[#7DD3FC]">
+<span class="material-symbols-outlined text-xl" data-icon="bolt">bolt</span>
+</div>
+<div>
+<div class="text-[11px] font-label-sm text-[#A3ACC2] uppercase tracking-wider">In Flight</div>
+<div class="text-lg font-headline-md font-bold text-[#E6E9F2]">5 In Progress</div>
+</div>
+</div>
+<div class="glass-surface rounded-xl p-4 flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-[#A5B4FC]/10 border border-[#A5B4FC]/20 flex items-center justify-center text-[#A5B4FC]">
+<span class="material-symbols-outlined text-xl" data-icon="group">group</span>
+</div>
+<div>
+<div class="text-[11px] font-label-sm text-[#A3ACC2] uppercase tracking-wider">Team Activity</div>
+<div class="text-lg font-headline-md font-bold text-[#E6E9F2]">5 Contributors</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Status / Footer Bar -->
+<footer class="w-full border-t border-white/[0.08] bg-[#080d1d]/70 backdrop-blur-xl px-8 py-3 flex flex-col sm:flex-row items-center justify-between text-xs text-on-surface-variant/70 gap-2">
+<!-- Left Operational Status -->
+<div class="flex items-center gap-3">
+<span class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-[#86EFAC] shadow-[0_0_6px_#86EFAC]"></span>
+<span class="text-[#E6E9F2] font-medium text-[11px]">All systems operational</span>
+</span>
+<span class="text-white/20">·</span>
+<span class="text-[11px] text-on-surface-variant flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-[#5EEAD4]" data-icon="sync">sync</span>
+          Realtime sync active (4 peers connected)
+        </span>
+</div>
+<!-- Right Shortcuts Helper -->
+<div class="flex items-center gap-4 text-[11px]">
+<div class="flex items-center gap-1.5">
+<kbd class="px-1.5 py-0.5 rounded bg-white/[0.07] border border-white/10 text-white/80 font-mono text-[10px]">N</kbd>
+<span class="">New task</span>
+</div>
+<div class="flex items-center gap-1.5">
+<kbd class="px-1.5 py-0.5 rounded bg-white/[0.07] border border-white/10 text-white/80 font-mono text-[10px]">?</kbd>
+<span class="">Keyboard shortcuts</span>
+</div>
+<span class="text-white/20">·</span>
+<span class="text-on-surface-variant/60">Taskify v2.4.1</span>
+</div>
+</footer>
+</div>
+
+
+</body></html>

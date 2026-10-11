@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Taskify — Who's working today?</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "inverse-primary": "#006b5e",
+            "surface-container": "#1a1f30",
+            "secondary-container": "#3131c0",
+            "surface-variant": "#2f3446",
+            "tertiary-container": "#ddcdff",
+            "on-secondary": "#1000a9",
+            "on-tertiary-fixed-variant": "#5516be",
+            "tertiary-fixed": "#e9ddff",
+            "surface": "#0e1323",
+            "on-error": "#690005",
+            "on-secondary-fixed": "#07006c",
+            "secondary-fixed-dim": "#c0c1ff",
+            "outline-variant": "#3c4946",
+            "primary": "#b5fff0",
+            "surface-container-high": "#25293a",
+            "primary-fixed": "#6ef9e2",
+            "on-error-container": "#ffdad6",
+            "on-surface": "#dee1f9",
+            "on-primary-fixed": "#00201b",
+            "on-secondary-container": "#b0b2ff",
+            "surface-container-highest": "#2f3446",
+            "secondary-fixed": "#e1e0ff",
+            "outline": "#859490",
+            "surface-dim": "#0e1323",
+            "primary-fixed-dim": "#4ddcc6",
+            "on-surface-variant": "#bbcac5",
+            "error-container": "#93000a",
+            "on-tertiary-fixed": "#23005c",
+            "error": "#ffb4ab",
+            "on-primary-fixed-variant": "#005047",
+            "on-secondary-fixed-variant": "#2f2ebe",
+            "primary-container": "#5eead4",
+            "tertiary": "#f6eeff",
+            "surface-container-low": "#161b2b",
+            "secondary": "#c0c1ff",
+            "surface-tint": "#4ddcc6",
+            "on-primary": "#003730",
+            "surface-bright": "#34394a",
+            "on-tertiary": "#3c0091",
+            "inverse-surface": "#dee1f9",
+            "on-primary-container": "#00675b",
+            "on-background": "#dee1f9",
+            "background": "#0e1323",
+            "on-tertiary-container": "#6b37d4",
+            "inverse-on-surface": "#2b3041",
+            "surface-container-lowest": "#080d1d",
+            "tertiary-fixed-dim": "#d0bcff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter": "1.25rem",
+            "space-xl": "1.75rem",
+            "margin": "2rem",
+            "space-lg": "1.25rem",
+            "space-md": "1rem",
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem"
+          },
+          "fontFamily": {
+            "headline-xl": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "label-lg": ["14px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "headline-md": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500" }],
+            "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      background-color: #0B1020;
+      color: #dee1f9;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    /* Aurora atmospheric glow keyframes */
+    @keyframes aurora-float-1 {
+      0%, 100% { transform: translate(0px, 0px) scale(1); }
+      50% { transform: translate(-30px, 20px) scale(1.08); }
+    }
+    @keyframes aurora-float-2 {
+      0%, 100% { transform: translate(0px, 0px) scale(1); }
+      50% { transform: translate(25px, -35px) scale(1.05); }
+    }
+    @keyframes aurora-float-3 {
+      0%, 100% { transform: translate(0px, 0px) scale(1); }
+      50% { transform: translate(-20px, -20px) scale(1.12); }
+    }
+
+    .aurora-blob-teal {
+      animation: aurora-float-1 16s ease-in-out infinite;
+    }
+    .aurora-blob-indigo {
+      animation: aurora-float-2 20s ease-in-out infinite;
+    }
+    .aurora-blob-violet {
+      animation: aurora-float-3 18s ease-in-out infinite;
+    }
+
+    /* Delicate top-edge optical reflection */
+    .glass-specular-edge {
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.20);
+    }
+    .glass-specular-edge-active {
+      box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.45);
+    }
+  </style>
+</head>
+<body class="min-h-screen h-screen w-full relative flex flex-col justify-between overflow-hidden bg-[#0B1020]">
+<!-- Ambient Ethereal Twilight Auroras (Z-0) -->
+<div aria-hidden="true" class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+<!-- Teal Ambient Pool -->
+<div class="aurora-blob-teal absolute -top-[15%] left-[22%] w-[680px] h-[520px] rounded-full bg-[#2DD4BF] opacity-[0.09] filter blur-[140px]"></div>
+<!-- Indigo Spatial Light -->
+<div class="aurora-blob-indigo absolute top-[30%] -right-[10%] w-[750px] h-[640px] rounded-full bg-[#6366F1] opacity-[0.11] filter blur-[150px]"></div>
+<!-- Violet Spatial Field -->
+<div class="aurora-blob-violet absolute -bottom-[18%] left-[10%] w-[820px] h-[600px] rounded-full bg-[#8B5CF6] opacity-[0.08] filter blur-[160px]"></div>
+<!-- Central subtle depth vignette -->
+<div class="absolute inset-0 bg-radial from-transparent via-[#0B1020]/40 to-[#0B1020]/90"></div>
+</div>
+<!-- Header Micro-Rail: Minimal Taskify Horizon Bar -->
+<header class="relative z-10 w-full px-8 py-6 flex items-center justify-between">
+<!-- Left: Brand anchor -->
+<div class="flex items-center gap-3">
+<div class="relative flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-primary-container/20 to-primary/5 border border-primary/25 shadow-[0_0_16px_rgba(94,234,212,0.25)]">
+<span class="material-symbols-outlined text-primary-container text-xl" data-icon="token">token</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg font-bold tracking-tight text-[#E6E9F2]">Taskify</span>
+<span class="text-[10px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded text-primary-container/80 bg-primary-container/10 border border-primary-container/20">Space</span>
+</div>
+</div>
+<!-- Right: Status Pill & System telemetry -->
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] backdrop-blur-md border border-white/[0.08] text-[#A3ACC2]">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#5EEAD4] opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-[#5EEAD4]"></span>
+</span>
+<span class="font-label-md text-label-md font-medium tracking-wide">Core Architecture Online</span>
+</div>
+</div>
+</header>
+<!-- Central Hero Stage -->
+<main class="relative z-10 flex-1 flex flex-col items-center justify-center px-4 max-w-7xl mx-auto w-full my-auto">
+<!-- Central Hero Headline Area -->
+<div class="text-center mb-10 max-w-2xl mx-auto">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-container/10 border border-primary-container/20 text-primary-container font-label-sm text-label-sm tracking-wide mb-5">
+<span class="material-symbols-outlined text-sm" data-icon="workspaces">workspaces</span>
+<span>WORKSPACE DISPATCH</span>
+</div>
+<h1 class="text-4xl md:text-5xl lg:text-[52px] font-bold text-[#E6E9F2] tracking-tight leading-none mb-3.5 drop-shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
+        Who's working today?
+      </h1>
+<p class="text-lg md:text-xl text-[#A3ACC2] font-medium tracking-normal">
+        Pick your name to continue.
+      </p>
+</div>
+<!-- 5 Generous Glass User Cards Horizontal Grid -->
+<div class="w-full flex flex-wrap items-center justify-center gap-5 lg:gap-6 py-2">
+<!-- Card 1: Alex Morgan (Product Manager) -->
+<button class="group relative w-[220px] h-[300px] rounded-[20px] p-5 flex flex-col items-center justify-between text-center transition-all duration-300 ease-out bg-white/[0.07] hover:bg-white/[0.12] backdrop-blur-[20px] border border-white/[0.12] hover:border-white/[0.24] glass-specular-edge shadow-[0_8px_24px_-4px_rgba(0,0,0,0.4)] hover:shadow-[0_16px_36px_-6px_rgba(0,0,0,0.6)] hover:-translate-y-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400" type="button">
+<!-- Ambient Top Reflection Pill -->
+<div class="w-10 h-1 rounded-full bg-white/20 mb-1 opacity-40 group-hover:opacity-75 transition-opacity"></div>
+<!-- Avatar Stack -->
+<div class="flex flex-col items-center">
+<div class="relative w-20 h-20 rounded-full flex items-center justify-center bg-[#C4B5FD] text-[#1E1B4B] font-bold text-2xl tracking-tight shadow-[0_0_24px_rgba(196,181,253,0.45)] group-hover:shadow-[0_0_32px_rgba(196,181,253,0.65)] transition-all duration-300 group-hover:scale-105">
+<span>AM</span>
+<!-- Floating Mini Status Beacon -->
+<span class="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-[#101426] p-0.5 flex items-center justify-center">
+<span class="w-3.5 h-3.5 rounded-full bg-[#818CF8]"></span>
+</span>
+</div>
+<!-- Name -->
+<h2 class="text-xl font-semibold text-[#E6E9F2] tracking-tight mt-4 group-hover:text-white transition-colors">
+            Alex Morgan
+          </h2>
+<!-- Role Chip: Lavender Tinted -->
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold text-[#A5B4FC] bg-[#6366F1]/15 border border-[#818CF8]/30 mt-2.5 tracking-wide">
+<span class="w-1.5 h-1.5 rounded-full bg-[#A5B4FC]"></span>
+            Product Manager
+          </span>
+</div>
+<!-- Subtle Action Prompt Footer -->
+<div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[11px] font-medium text-[#A3ACC2]/80 flex items-center gap-1">
+<span>Select</span>
+<span class="material-symbols-outlined text-[13px]" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</button>
+<!-- Card 2: Sam Lee (Engineer) — FOCUSED / ACTIVE STATE -->
+<button class="group relative w-[220px] h-[300px] rounded-[20px] p-5 flex flex-col items-center justify-between text-center transition-all duration-300 ease-out bg-white/[0.14] backdrop-blur-[24px] border-2 border-[#5EEAD4] glass-specular-edge-active shadow-[0_0_35px_rgba(94,234,212,0.38),0_16px_36px_-6px_rgba(0,0,0,0.6)] -translate-y-2.5 scale-[1.02] cursor-pointer focus:outline-none ring-4 ring-[#5EEAD4]/15" type="button">
+<!-- Active Corner Radiance Pip -->
+<div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-[#5EEAD4] text-[#042F2E] font-label-sm text-[10px] font-bold tracking-wider uppercase shadow-[0_0_16px_rgba(94,234,212,0.6)] flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" data-icon="check_circle" data-weight="fill">check_circle</span>
+          Current Pick
+        </div>
+<!-- Ambient Top Reflection Pill (Glows Teal) -->
+<div class="w-12 h-1 rounded-full bg-[#5EEAD4]/60 mb-1"></div>
+<!-- Avatar Stack -->
+<div class="flex flex-col items-center">
+<div class="relative w-20 h-20 rounded-full flex items-center justify-center bg-[#5EEAD4] text-[#042F2E] font-bold text-2xl tracking-tight shadow-[0_0_28px_rgba(94,234,212,0.65)] transition-all duration-300 group-hover:scale-105">
+<span>SL</span>
+<!-- Online Pulse Indicator -->
+<span class="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-[#080d1d] p-0.5 flex items-center justify-center">
+<span class="w-3.5 h-3.5 rounded-full bg-[#2DD4BF] shadow-[0_0_8px_#2DD4BF]"></span>
+</span>
+</div>
+<!-- Name -->
+<h2 class="text-xl font-semibold text-white tracking-tight mt-4">
+            Sam Lee
+          </h2>
+<!-- Role Chip: Neutral Glass with Active Hint -->
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium text-[#E6E9F2] bg-white/10 border border-white/20 mt-2.5 tracking-wide shadow-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-[#5EEAD4]"></span>
+            Engineer
+          </span>
+</div>
+<!-- Dedicated Keyboard/Click Indicator Callout -->
+<div class="flex items-center gap-1.5 text-[11px] font-semibold text-[#5EEAD4] tracking-tight bg-[#5EEAD4]/10 border border-[#5EEAD4]/25 px-2.5 py-0.5 rounded-full">
+<span>Press Enter or Click</span>
+<span class="material-symbols-outlined text-[13px]" data-icon="keyboard_return">keyboard_return</span>
+</div>
+</button>
+<!-- Card 3: Jordan Patel (Engineer) -->
+<button class="group relative w-[220px] h-[300px] rounded-[20px] p-5 flex flex-col items-center justify-between text-center transition-all duration-300 ease-out bg-white/[0.07] hover:bg-white/[0.12] backdrop-blur-[20px] border border-white/[0.12] hover:border-white/[0.24] glass-specular-edge shadow-[0_8px_24px_-4px_rgba(0,0,0,0.4)] hover:shadow-[0_16px_36px_-6px_rgba(0,0,0,0.6)] hover:-translate-y-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400" type="button">
+<!-- Ambient Top Reflection Pill -->
+<div class="w-10 h-1 rounded-full bg-white/20 mb-1 opacity-40 group-hover:opacity-75 transition-opacity"></div>
+<!-- Avatar Stack -->
+<div class="flex flex-col items-center">
+<div class="relative w-20 h-20 rounded-full flex items-center justify-center bg-[#F9A8D4] text-[#831843] font-bold text-2xl tracking-tight shadow-[0_0_24px_rgba(249,168,212,0.45)] group-hover:shadow-[0_0_32px_rgba(249,168,212,0.65)] transition-all duration-300 group-hover:scale-105">
+<span>JP</span>
+<span class="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-[#101426] p-0.5 flex items-center justify-center">
+<span class="w-3.5 h-3.5 rounded-full bg-[#F472B6]"></span>
+</span>
+</div>
+<!-- Name -->
+<h2 class="text-xl font-semibold text-[#E6E9F2] tracking-tight mt-4 group-hover:text-white transition-colors">
+            Jordan Patel
+          </h2>
+<!-- Role Chip: Neutral Glass -->
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium text-[#A3ACC2] bg-white/5 border border-white/10 mt-2.5 tracking-wide">
+            Engineer
+          </span>
+</div>
+<!-- Action Prompt -->
+<div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[11px] font-medium text-[#A3ACC2]/80 flex items-center gap-1">
+<span>Select</span>
+<span class="material-symbols-outlined text-[13px]" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</button>
+<!-- Card 4: Riley Chen (Engineer) -->
+<button class="group relative w-[220px] h-[300px] rounded-[20px] p-5 flex flex-col items-center justify-between text-center transition-all duration-300 ease-out bg-white/[0.07] hover:bg-white/[0.12] backdrop-blur-[20px] border border-white/[0.12] hover:border-white/[0.24] glass-specular-edge shadow-[0_8px_24px_-4px_rgba(0,0,0,0.4)] hover:shadow-[0_16px_36px_-6px_rgba(0,0,0,0.6)] hover:-translate-y-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400" type="button">
+<!-- Ambient Top Reflection Pill -->
+<div class="w-10 h-1 rounded-full bg-white/20 mb-1 opacity-40 group-hover:opacity-75 transition-opacity"></div>
+<!-- Avatar Stack -->
+<div class="flex flex-col items-center">
+<div class="relative w-20 h-20 rounded-full flex items-center justify-center bg-[#FDBA74] text-[#7C2D12] font-bold text-2xl tracking-tight shadow-[0_0_24px_rgba(253,186,116,0.45)] group-hover:shadow-[0_0_32px_rgba(253,186,116,0.65)] transition-all duration-300 group-hover:scale-105">
+<span>RC</span>
+<span class="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-[#101426] p-0.5 flex items-center justify-center">
+<span class="w-3.5 h-3.5 rounded-full bg-[#FB923C]"></span>
+</span>
+</div>
+<!-- Name -->
+<h2 class="text-xl font-semibold text-[#E6E9F2] tracking-tight mt-4 group-hover:text-white transition-colors">
+            Riley Chen
+          </h2>
+<!-- Role Chip: Neutral Glass -->
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium text-[#A3ACC2] bg-white/5 border border-white/10 mt-2.5 tracking-wide">
+            Engineer
+          </span>
+</div>
+<!-- Action Prompt -->
+<div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[11px] font-medium text-[#A3ACC2]/80 flex items-center gap-1">
+<span>Select</span>
+<span class="material-symbols-outlined text-[13px]" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</button>
+<!-- Card 5: Taylor Brooks (Engineer) -->
+<button class="group relative w-[220px] h-[300px] rounded-[20px] p-5 flex flex-col items-center justify-between text-center transition-all duration-300 ease-out bg-white/[0.07] hover:bg-white/[0.12] backdrop-blur-[20px] border border-white/[0.12] hover:border-white/[0.24] glass-specular-edge shadow-[0_8px_24px_-4px_rgba(0,0,0,0.4)] hover:shadow-[0_16px_36px_-6px_rgba(0,0,0,0.6)] hover:-translate-y-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400" type="button">
+<!-- Ambient Top Reflection Pill -->
+<div class="w-10 h-1 rounded-full bg-white/20 mb-1 opacity-40 group-hover:opacity-75 transition-opacity"></div>
+<!-- Avatar Stack -->
+<div class="flex flex-col items-center">
+<div class="relative w-20 h-20 rounded-full flex items-center justify-center bg-[#93C5FD] text-[#1E3A8A] font-bold text-2xl tracking-tight shadow-[0_0_24px_rgba(147,197,253,0.45)] group-hover:shadow-[0_0_32px_rgba(147,197,253,0.65)] transition-all duration-300 group-hover:scale-105">
+<span>TB</span>
+<span class="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-[#101426] p-0.5 flex items-center justify-center">
+<span class="w-3.5 h-3.5 rounded-full bg-[#60A5FA]"></span>
+</span>
+</div>
+<!-- Name -->
+<h2 class="text-xl font-semibold text-[#E6E9F2] tracking-tight mt-4 group-hover:text-white transition-colors">
+            Taylor Brooks
+          </h2>
+<!-- Role Chip: Neutral Glass -->
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium text-[#A3ACC2] bg-white/5 border border-white/10 mt-2.5 tracking-wide">
+            Engineer
+          </span>
+</div>
+<!-- Action Prompt -->
+<div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[11px] font-medium text-[#A3ACC2]/80 flex items-center gap-1">
+<span>Select</span>
+<span class="material-symbols-outlined text-[13px]" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</button>
+</div>
+<!-- Quick Keyboard Guidance Badge -->
+<div class="mt-8 flex items-center gap-4 text-xs text-[#A3ACC2]/70 font-medium tracking-wide">
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08]">
+<kbd class="px-1.5 py-0.5 rounded text-[10px] bg-white/10 text-[#E6E9F2] font-semibold border border-white/15">←</kbd>
+<kbd class="px-1.5 py-0.5 rounded text-[10px] bg-white/10 text-[#E6E9F2] font-semibold border border-white/15">→</kbd>
+<span>to navigate</span>
+</div>
+<div class="w-1 h-1 rounded-full bg-white/20"></div>
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08]">
+<kbd class="px-2 py-0.5 rounded text-[10px] bg-white/10 text-[#E6E9F2] font-semibold border border-white/15">Enter ↵</kbd>
+<span>to open board</span>
+</div>
+</div>
+</main>
+<!-- Muted Footnote & Operational Anchor -->
+<footer class="relative z-10 w-full pb-6 pt-2 px-8 flex flex-col md:flex-row items-center justify-between text-center gap-3">
+<!-- Left telemetry -->
+<div class="text-[12px] text-[#A3ACC2]/50 font-medium tracking-wide order-2 md:order-1">
+      Taskify Nocturnal Architecture v2.4 • Aurora Edition
+    </div>
+<!-- Center Note: Phase 1 Demo Notice -->
+<div class="order-1 md:order-2 flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.03] backdrop-blur-md border border-white/[0.06] text-[13px] text-[#A3ACC2] font-medium">
+<span class="material-symbols-outlined text-[15px] text-primary-container" data-icon="info">info</span>
+<span>Phase 1 demo. Anyone can choose any user.</span>
+</div>
+<!-- Right: Operational status indicator -->
+<div class="order-3 flex items-center gap-2 text-[12px] text-[#A3ACC2]/60 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+<span>All systems operational</span>
+</div>
+</footer>
+<!-- Light micro-interaction vanilla script for keyboard arrow cycling -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const cards = Array.from(document.querySelectorAll('main button'));
+      let currentIndex = 1; // Sam Lee is default index 1
+
+      function focusCard(index) {
+        if (index < 0) index = cards.length - 1;
+        if (index >= cards.length) index = 0;
+        currentIndex = index;
+        cards[currentIndex].focus();
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          focusCard(currentIndex + 1);
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          focusCard(currentIndex - 1);
+        }
+      });
+
+      cards.forEach((card, idx) => {
+        card.addEventListener('mouseenter', () => {
+          currentIndex = idx;
+        });
+      });
+    });
+  </script>
+</body></html>

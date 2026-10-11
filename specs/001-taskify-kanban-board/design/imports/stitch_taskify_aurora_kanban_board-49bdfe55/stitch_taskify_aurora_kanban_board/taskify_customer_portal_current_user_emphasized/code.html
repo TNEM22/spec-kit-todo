@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Taskify · Customer Portal Board</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "outline": "#859490",
+            "surface-tint": "#4ddcc6",
+            "primary-container": "#5eead4",
+            "primary-fixed-dim": "#4ddcc6",
+            "inverse-primary": "#006b5e",
+            "on-error-container": "#ffdad6",
+            "outline-variant": "#3c4946",
+            "on-tertiary-fixed": "#23005c",
+            "tertiary-fixed": "#e9ddff",
+            "on-primary-fixed-variant": "#005047",
+            "surface-container-low": "#161b2b",
+            "surface-variant": "#2f3446",
+            "tertiary-fixed-dim": "#d0bcff",
+            "surface-container-highest": "#2f3446",
+            "on-surface-variant": "#bbcac5",
+            "secondary-container": "#3131c0",
+            "on-secondary-fixed": "#07006c",
+            "primary": "#b5fff0",
+            "on-secondary-fixed-variant": "#2f2ebe",
+            "on-tertiary-fixed-variant": "#5516be",
+            "on-secondary": "#1000a9",
+            "on-primary-container": "#00675b",
+            "on-tertiary": "#3c0091",
+            "surface-container": "#1a1f30",
+            "surface-container-high": "#25293a",
+            "surface-bright": "#34394a",
+            "surface": "#0e1323",
+            "on-surface": "#dee1f9",
+            "secondary": "#c0c1ff",
+            "error-container": "#93000a",
+            "on-primary-fixed": "#00201b",
+            "surface-container-lowest": "#080d1d",
+            "error": "#ffb4ab",
+            "tertiary": "#f6eeff",
+            "on-secondary-container": "#b0b2ff",
+            "inverse-on-surface": "#2b3041",
+            "on-background": "#dee1f9",
+            "surface-dim": "#0e1323",
+            "on-error": "#690005",
+            "secondary-fixed": "#e1e0ff",
+            "primary-fixed": "#6ef9e2",
+            "on-tertiary-container": "#6b37d4",
+            "inverse-surface": "#dee1f9",
+            "tertiary-container": "#ddcdff",
+            "background": "#0e1323",
+            "secondary-fixed-dim": "#c0c1ff",
+            "on-primary": "#003730"
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          spacing: {
+            "space-xs": "0.25rem",
+            "space-xl": "1.75rem",
+            "margin": "2rem",
+            "space-lg": "1.25rem",
+            "space-md": "1rem",
+            "gutter": "1.25rem",
+            "space-sm": "0.5rem"
+          },
+          fontFamily: {
+            "body-sm": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "headline-xl": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"]
+          },
+          fontSize: {
+            "body-sm": ["12px", { lineHeight: "16px", letterSpacing: "0.01em", fontWeight: "400" }],
+            "body-md": ["14px", { lineHeight: "20px", letterSpacing: "0", fontWeight: "400" }],
+            "headline-lg": ["24px", { lineHeight: "32px", letterSpacing: "-0.015em", fontWeight: "600" }],
+            "body-lg": ["16px", { lineHeight: "24px", letterSpacing: "-0.005em", fontWeight: "400" }],
+            "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.02em", fontWeight: "600" }],
+            "headline-xl": ["32px", { lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "700" }],
+            "label-lg": ["14px", { lineHeight: "18px", letterSpacing: "0.01em", fontWeight: "600" }],
+            "headline-md": ["18px", { lineHeight: "24px", letterSpacing: "-0.01em", fontWeight: "600" }],
+            "label-sm": ["11px", { lineHeight: "14px", letterSpacing: "0.03em", fontWeight: "500" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+  </style>
+</head>
+<body class="bg-[#0B1020] text-[#E6E9F2] font-body-md text-body-md antialiased min-h-screen relative overflow-x-hidden selection:bg-[#5EEAD4]/30 selection:text-white">
+<!-- ================= AMBIENT ORGANIC AURORA ORBS ================= -->
+<div aria-hidden="true" class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+<!-- Teal Ambient Glow -->
+<div class="absolute -top-32 left-[12%] w-[580px] h-[580px] rounded-full bg-[#2DD4BF] opacity-[0.14] blur-[140px]"></div>
+<!-- Indigo Ambient Glow -->
+<div class="absolute top-[35%] right-[8%] w-[640px] h-[640px] rounded-full bg-[#6366F1] opacity-[0.15] blur-[150px]"></div>
+<!-- Violet Ambient Glow -->
+<div class="absolute bottom-[-10%] left-[30%] w-[620px] h-[620px] rounded-full bg-[#8B5CF6] opacity-[0.12] blur-[160px]"></div>
+<!-- Subtle Secondary Teal Accent Orb -->
+<div class="absolute top-[65%] -left-[10%] w-[480px] h-[480px] rounded-full bg-[#2DD4BF] opacity-[0.09] blur-[130px]"></div>
+</div>
+<div class="relative z-10 flex min-h-screen flex-col">
+<!-- ================= TOP NAVIGATION BAR (SHARED COMPONENT) ================= -->
+<header class="bg-surface-container-low/80 backdrop-blur-xl docked full-width top-0 sticky z-50 shadow-[0_8px_24px_-4px_rgba(0,0,0,0.35)]">
+<div class="flex justify-between items-center w-full px-8 py-3">
+<!-- Left Brand & Context -->
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#2DD4BF] to-[#6366F1] p-[1px] shadow-[0_0_14px_rgba(45,212,191,0.45)]">
+<div class="w-full h-full bg-[#0B1020] rounded-[11px] flex items-center justify-center">
+<span class="material-symbols-outlined text-[#5EEAD4] text-[18px]" data-icon="auto_awesome">auto_awesome</span>
+</div>
+</div>
+<span class="font-headline-lg text-headline-lg font-bold tracking-tight text-on-surface">Taskify</span>
+</div>
+<div class="h-4 w-[1px] bg-white/10 hidden sm:block"></div>
+<!-- Breadcrumbs -->
+<nav class="hidden md:flex items-center gap-2 font-label-md text-label-md text-[#A3ACC2]">
+<span>Projects</span>
+<span class="text-white/20">/</span>
+<span class="text-[#E6E9F2] font-semibold flex items-center gap-1.5">
+              Customer Portal
+              <span class="w-1.5 h-1.5 rounded-full bg-[#5EEAD4] inline-block"></span>
+</span>
+</nav>
+</div>
+<!-- Center Global Nav Links (Shared Components JSON Anchor) -->
+<nav class="hidden lg:flex items-center gap-8 font-label-lg text-label-lg">
+<a class="text-on-surface-variant hover:text-on-surface transition-colors pb-1" href="#">Workspace</a>
+<a class="text-primary border-b-2 border-primary font-semibold pb-1" href="#">Boards</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors pb-1" href="#">Timeline</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors pb-1" href="#">Analytics</a>
+</nav>
+<!-- Right User & Workspace Utility Cluster -->
+<div class="flex items-center gap-4">
+<!-- Search trigger -->
+<div class="relative hidden sm:flex items-center">
+<span class="material-symbols-outlined text-[#A3ACC2] text-[18px] absolute left-3 pointer-events-none" data-icon="search">search</span>
+<input class="w-48 xl:w-60 h-9 pl-9 pr-8 text-body-sm font-body-sm text-[#E6E9F2] bg-white/[0.05] border border-white/[0.12] rounded-xl placeholder-[#A3ACC2]/60 focus:outline-none focus:border-[#5EEAD4] focus:ring-2 focus:ring-[#5EEAD4]/20 transition-all" placeholder="Search issues, tags..." type="text"/>
+<kbd class="absolute right-2.5 px-1.5 py-0.5 text-[10px] font-mono text-[#A3ACC2]/70 bg-white/[0.06] rounded border border-white/10">⌘K</kbd>
+</div>
+<!-- Quick Action Icons -->
+<div class="flex items-center gap-1 text-[#A3ACC2]">
+<button class="relative w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/[0.08] hover:text-[#E6E9F2] transition-colors active:scale-[0.98]">
+<span class="material-symbols-outlined text-[20px]" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#5EEAD4] ring-2 ring-[#0B1020]"></span>
+</button>
+<button class="w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/[0.08] hover:text-[#E6E9F2] transition-colors active:scale-[0.98]">
+<span class="material-symbols-outlined text-[20px]" data-icon="tune">tune</span>
+</button>
+</div>
+<div class="h-6 w-[1px] bg-white/10"></div>
+<!-- User Chip with Avatar & Switch Action -->
+<div class="flex items-center gap-3 pl-1 pr-2 py-1 rounded-full bg-white/[0.06] border border-white/[0.14] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15)] backdrop-blur-md">
+<div class="w-7 h-7 rounded-full bg-[#5EEAD4]/20 border border-[#5EEAD4] flex items-center justify-center text-[#5EEAD4] font-label-sm text-label-sm font-bold shadow-[0_0_10px_rgba(94,234,212,0.3)]">
+              SL
+            </div>
+<div class="hidden sm:flex flex-col text-left">
+<span class="font-label-sm text-label-sm text-[#E6E9F2] font-medium leading-none">Sam Lee</span>
+<span class="font-body-sm text-[10px] text-[#A3ACC2] leading-tight">Engineer</span>
+</div>
+<button class="flex items-center gap-1 pl-1 text-[11px] font-label-sm text-[#5EEAD4] hover:text-[#b5fff0] transition-colors group" title="Switch user">
+<span class="material-symbols-outlined text-[15px] group-hover:rotate-180 transition-transform duration-300" data-icon="swap_horiz">swap_horiz</span>
+<span class="hidden md:inline font-medium">Switch</span>
+</button>
+</div>
+</div>
+</div>
+</header>
+<!-- ================= MAIN WORKSPACE CONTENT ================= -->
+<main class="flex-1 w-full px-8 py-6 max-w-[1920px] mx-auto flex flex-col">
+<!-- Project Header Area -->
+<section class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-white/[0.08]">
+<!-- Left: Title & Overview -->
+<div class="space-y-1.5 max-w-3xl">
+<div class="flex items-center gap-3">
+<h1 class="font-headline-xl text-headline-xl font-bold tracking-tight text-[#E6E9F2]">
+              Customer Portal
+            </h1>
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-[#5EEAD4]/10 text-[#5EEAD4] border border-[#5EEAD4]/20">
+<span class="w-1.5 h-1.5 rounded-full bg-[#5EEAD4] animate-pulse"></span>
+              Sprint 24 · Active
+            </span>
+</div>
+<p class="font-body-md text-body-md text-[#A3ACC2] leading-relaxed">
+            Core customer authentication, billing management, and self-serve settings for enterprise clients.
+          </p>
+</div>
+<!-- Right: Action Bar, Facepile & Primary Action -->
+<div class="flex flex-wrap items-center gap-4 lg:self-end">
+<!-- Team Facepile Stack -->
+<div class="flex items-center bg-white/[0.04] p-1.5 rounded-full border border-white/[0.1] backdrop-blur-md">
+<span class="text-body-sm font-body-sm text-[#A3ACC2] px-2.5 hidden sm:inline">Team</span>
+<div class="flex items-center -space-x-2 mr-1">
+<div class="relative group cursor-pointer">
+<div class="w-8 h-8 rounded-full bg-[#5EEAD4]/20 border-2 border-[#0B1020] text-[#5EEAD4] font-label-sm text-[11px] font-bold flex items-center justify-center ring-1 ring-[#5EEAD4]/50 shadow-[0_0_8px_rgba(94,234,212,0.3)]">
+                  SL
+                </div>
+<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-30 px-2.5 py-1 text-xs rounded-lg bg-[#161B2B]/90 backdrop-blur-xl border border-white/20 text-[#E6E9F2] whitespace-nowrap shadow-xl">
+                  Sam Lee (You) · Lead
+                </div>
+</div>
+<div class="relative group cursor-pointer">
+<div class="w-8 h-8 rounded-full bg-[#8B5CF6]/20 border-2 border-[#0B1020] text-[#C4B5FD] font-label-sm text-[11px] font-bold flex items-center justify-center ring-1 ring-white/20">
+                  TB
+                </div>
+<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-30 px-2.5 py-1 text-xs rounded-lg bg-[#161B2B]/90 backdrop-blur-xl border border-white/20 text-[#E6E9F2] whitespace-nowrap shadow-xl">
+                  Taylor Brooks · Product Designer
+                </div>
+</div>
+<div class="relative group cursor-pointer">
+<div class="w-8 h-8 rounded-full bg-[#FB7185]/20 border-2 border-[#0B1020] text-[#FDA4AF] font-label-sm text-[11px] font-bold flex items-center justify-center ring-1 ring-white/20">
+                  RC
+                </div>
+<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-30 px-2.5 py-1 text-xs rounded-lg bg-[#161B2B]/90 backdrop-blur-xl border border-white/20 text-[#E6E9F2] whitespace-nowrap shadow-xl">
+                  Riley Chen · Frontend Dev
+                </div>
+</div>
+<div class="relative group cursor-pointer">
+<div class="w-8 h-8 rounded-full bg-[#6366F1]/20 border-2 border-[#0B1020] text-[#A5B4FC] font-label-sm text-[11px] font-bold flex items-center justify-center ring-1 ring-white/20">
+                  AM
+                </div>
+<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-30 px-2.5 py-1 text-xs rounded-lg bg-[#161B2B]/90 backdrop-blur-xl border border-white/20 text-[#E6E9F2] whitespace-nowrap shadow-xl">
+                  Alex Morgan · Fullstack Dev
+                </div>
+</div>
+<div class="relative group cursor-pointer">
+<div class="w-8 h-8 rounded-full bg-[#34D399]/20 border-2 border-[#0B1020] text-[#6EE7B7] font-label-sm text-[11px] font-bold flex items-center justify-center ring-1 ring-white/20">
+                  JP
+                </div>
+<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-30 px-2.5 py-1 text-xs rounded-lg bg-[#161B2B]/90 backdrop-blur-xl border border-white/20 text-[#E6E9F2] whitespace-nowrap shadow-xl">
+                  Jordan Patel · DevOps Specialist
+                </div>
+</div>
+</div>
+<button class="w-7 h-7 rounded-full bg-white/[0.08] hover:bg-white/[0.15] text-[#A3ACC2] hover:text-white flex items-center justify-center text-xs transition-colors" title="Invite member">
+<span class="material-symbols-outlined text-[16px]" data-icon="add">add</span>
+</button>
+</div>
+<!-- View Switcher (Board vs List) -->
+<div class="flex items-center p-1 bg-white/[0.05] border border-white/[0.12] rounded-full backdrop-blur-md">
+<button class="px-3.5 py-1.5 rounded-full text-label-sm font-label-sm font-semibold bg-white/[0.14] text-[#E6E9F2] shadow-sm flex items-center gap-1.5 transition-all">
+<span class="material-symbols-outlined text-[16px] text-[#5EEAD4]" data-icon="view_kanban">view_kanban</span>
+              Board
+            </button>
+<button class="px-3.5 py-1.5 rounded-full text-label-sm font-label-sm font-medium text-[#A3ACC2] hover:text-[#E6E9F2] flex items-center gap-1.5 transition-all">
+<span class="material-symbols-outlined text-[16px]" data-icon="format_list_bulleted">format_list_bulleted</span>
+              List
+            </button>
+</div>
+<!-- Filter Pill -->
+<button class="h-10 px-4 rounded-full bg-white/[0.06] hover:bg-white/[0.12] text-[#E6E9F2] border border-white/[0.14] font-label-sm text-label-sm font-semibold flex items-center gap-2 transition-all">
+<span class="material-symbols-outlined text-[18px] text-[#A3ACC2]" data-icon="filter_list">filter_list</span>
+<span>Filter</span>
+</button>
+<!-- Primary Button: New Task -->
+<button class="h-10 px-5 rounded-full bg-[#5EEAD4] hover:bg-[#6ef9e2] text-[#0B1020] font-label-lg text-label-lg font-bold flex items-center gap-2 shadow-[0_0_18px_rgba(94,234,212,0.35)] hover:shadow-[0_0_24px_rgba(94,234,212,0.55)] active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+<span>New task</span>
+</button>
+</div>
+</section>
+<!-- ================= 4-COLUMN KANBAN BOARD CANVAS ================= -->
+<section class="mt-8 flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-gutter items-start pb-12">
+<!-- ================= COLUMN 1: TO DO ================= -->
+<div class="flex flex-col rounded-[20px] bg-white/[0.04] backdrop-blur-2xl border border-white/[0.09] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] p-4 relative overflow-visible">
+<!-- Top Accent Light Line -->
+<div class="absolute top-0 left-6 right-6 h-[2px] bg-gradient-to-r from-transparent via-[#94A3B8]/60 to-transparent"></div>
+<!-- Column Header -->
+<div class="flex items-center justify-between pb-4 pt-1 px-1">
+<div class="flex items-center gap-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#94A3B8] shadow-[0_0_8px_rgba(148,163,184,0.6)]"></span>
+<h2 class="font-label-lg text-label-lg font-semibold text-[#E6E9F2] tracking-wide">To Do</h2>
+<span class="px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-white/[0.06] border border-white/[0.08] text-[#A3ACC2]">2</span>
+</div>
+<div class="flex items-center gap-1 text-[#A3ACC2]">
+<button class="w-7 h-7 rounded-lg hover:bg-white/[0.08] hover:text-white flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+</button>
+<button class="w-7 h-7 rounded-lg hover:bg-white/[0.08] hover:text-white flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- Cards Stack -->
+<div class="flex flex-col gap-3 min-h-[420px]">
+<!-- Card 1.1: Add CSV export -->
+<article class="group relative rounded-2xl bg-white/[0.04] opacity-80 hover:opacity-100 hover:bg-white/[0.08] backdrop-blur-xl border border-white/[0.08] hover:border-white/[0.18] p-4 shadow-[0_8px_24px_-4px_rgba(0,0,0,0.35)] transition-all duration-200 hover:-translate-y-0.5 cursor-grab">
+<div class="flex items-start justify-between gap-3 mb-2.5">
+<span class="px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-blue-500/10 text-blue-300 border border-blue-400/20">
+                  Reports
+                </span>
+<span class="text-[#A3ACC2] text-xs font-mono font-medium">#TP-108</span>
+</div>
+<h3 class="font-headline-md text-[15px] font-semibold text-[#E6E9F2] leading-snug mb-1.5 group-hover:text-white">
+                Add CSV export to reports
+              </h3>
+<p class="font-body-sm text-body-sm text-[#A3ACC2] line-clamp-2 mb-4">
+                Allow financial directors to export aggregated seat billing and API volume usage data.
+              </p>
+<div class="pt-3 border-t border-white/[0.07] flex items-center justify-between">
+<!-- Assignee: Unassigned -->
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full border border-dashed border-white/40 flex items-center justify-center text-[#A3ACC2]">
+<span class="material-symbols-outlined text-[14px]" data-icon="person">person</span>
+</div>
+<span class="font-body-sm text-body-sm text-[#A3ACC2]/80">Unassigned</span>
+</div>
+<!-- Subtasks & Priority -->
+<div class="flex items-center gap-3 text-[#A3ACC2] text-xs">
+<span class="flex items-center gap-1" title="Subtasks">
+<span class="material-symbols-outlined text-[15px]" data-icon="check_box">check_box</span>
+                    0/3
+                  </span>
+<span class="material-symbols-outlined text-[15px] text-[#A3ACC2]" data-icon="flag" title="Medium priority">flag</span>
+</div>
+</div>
+</article>
+<!-- Card 1.2: Write release notes -->
+<article class="group relative rounded-2xl bg-white/[0.04] opacity-80 hover:opacity-100 hover:bg-white/[0.08] backdrop-blur-xl border border-white/[0.08] hover:border-white/[0.18] p-4 shadow-[0_8px_24px_-4px_rgba(0,0,0,0.35)] transition-all duration-200 hover:-translate-y-0.5 cursor-grab">
+<div class="flex items-start justify-between gap-3 mb-2.5">
+<span class="px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-purple-500/10 text-purple-300 border border-purple-400/20">
+                  Documentation
+                </span>
+<span class="text-[#A3ACC2] text-xs font-mono font-medium">#TP-114</span>
+</div>
+<h3 class="font-headline-md text-[15px] font-semibold text-[#E6E9F2] leading-snug mb-1.5 group-hover:text-white">
+                Write release notes
+              </h3>
+<p class="font-body-sm text-body-sm text-[#A3ACC2] line-clamp-2 mb-4">
+                Compile changelog for v2.4 launch regarding SSO migrations and security token lifespan adjustments.
+              </p>
+<div class="pt-3 border-t border-white/[0.07] flex items-center justify-between">
+<!-- Assignee: Taylor Brooks -->
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-[#8B5CF6]/25 border border-[#8B5CF6]/50 flex items-center justify-center text-[#C4B5FD] font-label-sm text-[10px] font-bold">
+                    TB
+                  </div>
+<span class="font-body-sm text-body-sm text-[#E6E9F2]">Taylor Brooks</span>
+</div>
+<div class="flex items-center gap-3 text-[#A3ACC2] text-xs">
+<span class="flex items-center gap-1 text-[#FCD34D]" title="Due in 2 days">
+<span class="material-symbols-outlined text-[15px]" data-icon="schedule">schedule</span>
+                    2d
+                  </span>
+<span class="material-symbols-outlined text-[15px] text-sky-400" data-icon="flag" title="Low priority">flag</span>
+</div>
+</div>
+</article>
+</div>
+</div>
+<!-- ================= COLUMN 2: IN PROGRESS ================= -->
+<div class="flex flex-col rounded-[20px] bg-white/[0.04] backdrop-blur-2xl border border-white/[0.09] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] p-4 relative overflow-visible">
+<!-- Top Accent Light Line -->
+<div class="absolute top-0 left-6 right-6 h-[2px] bg-gradient-to-r from-transparent via-[#7DD3FC]/70 to-transparent"></div>
+<!-- Column Header -->
+<div class="flex items-center justify-between pb-4 pt-1 px-1">
+<div class="flex items-center gap-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#7DD3FC] shadow-[0_0_8px_rgba(125,211,252,0.6)]"></span>
+<h2 class="font-label-lg text-label-lg font-semibold text-[#E6E9F2] tracking-wide">In Progress</h2>
+<span class="px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-white/[0.06] border border-white/[0.08] text-[#A3ACC2]">2</span>
+</div>
+<div class="flex items-center gap-1 text-[#A3ACC2]">
+<button class="w-7 h-7 rounded-lg hover:bg-white/[0.08] hover:text-white flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+</button>
+<button class="w-7 h-7 rounded-lg hover:bg-white/[0.08] hover:text-white flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- Cards Stack -->
+<div class="flex flex-col gap-3 min-h-[420px]">
+<!-- Card 2.1: Build account settings page (User task with teal left bar & 'You' badge) -->
+<article class="group relative rounded-2xl bg-white/[0.13] hover:bg-white/[0.17] backdrop-blur-xl border border-white/[0.18] hover:border-white/[0.28] p-4 shadow-[0_12px_28px_-4px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.22)] transition-all duration-200 hover:-translate-y-0.5 cursor-grab">
+<!-- Glowing Teal Left Edge Accent Strip -->
+<div class="absolute left-0 top-3 bottom-3 w-[3.5px] rounded-r-full bg-[#5EEAD4] shadow-[0_0_12px_rgba(94,234,212,0.8)]"></div>
+<div class="flex items-start justify-between gap-3 mb-2.5 pl-2">
+<span class="px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-[#5EEAD4]/10 text-[#5EEAD4] border border-[#5EEAD4]/25 font-semibold">
+                  Frontend
+                </span>
+<span class="text-[#A3ACC2] text-xs font-mono font-medium">#TP-092</span>
+</div>
+<h3 class="font-headline-md text-[15px] font-semibold text-white leading-snug mb-1.5 pl-2">
+                Build account settings page
+              </h3>
+<p class="font-body-sm text-body-sm text-[#A3ACC2] line-clamp-2 mb-4 pl-2">
+                Integrate multi-factor authentication preferences, recovery keys generation, and webhook configurations.
+              </p>
+<!-- Progress bar micro-indicator -->
+<div class="mx-2 mb-3">
+<div class="flex justify-between text-[11px] text-[#A3ACC2] mb-1 font-body-sm">
+<span>Implementation</span>
+<span class="text-[#5EEAD4] font-medium">75%</span>
+</div>
+<div class="w-full h-1.5 rounded-full bg-white/[0.08] overflow-hidden">
+<div class="h-full bg-gradient-to-r from-[#2DD4BF] to-[#5EEAD4] rounded-full w-3/4 shadow-[0_0_8px_rgba(94,234,212,0.4)]"></div>
+</div>
+</div>
+<div class="pt-3 border-t border-white/[0.08] flex items-center justify-between pl-2">
+<!-- Assignee: Sam Lee with 'You' chip -->
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-[#5EEAD4]/25 border border-[#5EEAD4] flex items-center justify-center text-[#5EEAD4] font-label-sm text-[10px] font-bold shadow-[0_0_8px_rgba(94,234,212,0.3)]">
+                    SL
+                  </div>
+<span class="font-body-sm text-body-sm text-[#E6E9F2] font-medium">Sam Lee</span>
+<span class="bg-[#5EEAD4] text-[#0B1020] font-semibold px-2 py-0.5 rounded-full text-xs shadow-[0_0_8px_rgba(94,234,212,0.4)]">You</span>
+</div>
+<div class="flex items-center gap-3 text-[#A3ACC2] text-xs">
+<span class="flex items-center gap-1 text-[#5EEAD4]" title="Subtasks">
+<span class="material-symbols-outlined text-[15px]" data-icon="task_alt">task_alt</span>
+                    6/8
+                  </span>
+<span class="material-symbols-outlined text-[15px] text-rose-400" data-icon="flag" title="High priority">flag</span>
+</div>
+</div>
+</article>
+<!-- Card 2.2: Ghost slot showing item was picked up for drag -->
+<div class="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 flex items-center justify-between opacity-50 border-dashed">
+<div class="flex items-center gap-2 text-body-sm font-body-sm text-[#A3ACC2]">
+<span class="material-symbols-outlined text-[18px] text-[#7DD3FC] animate-spin" data-icon="sync_alt">sync_alt</span>
+<span class="italic">Moving item to In Review...</span>
+</div>
+<span class="text-xs text-[#A3ACC2]/60 font-mono">#TP-099</span>
+</div>
+</div>
+</div>
+<!-- ================= COLUMN 3: IN REVIEW ================= -->
+<div class="flex flex-col rounded-[20px] bg-white/[0.04] backdrop-blur-2xl border border-white/[0.09] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] p-4 relative overflow-visible">
+<!-- Top Accent Light Line -->
+<div class="absolute top-0 left-6 right-6 h-[2px] bg-gradient-to-r from-transparent via-[#FCD34D]/70 to-transparent"></div>
+<!-- Column Header -->
+<div class="flex items-center justify-between pb-4 pt-1 px-1">
+<div class="flex items-center gap-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#FCD34D] shadow-[0_0_8px_rgba(252,211,77,0.6)]"></span>
+<h2 class="font-label-lg text-label-lg font-semibold text-[#E6E9F2] tracking-wide">In Review</h2>
+<span class="px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-white/[0.06] border border-white/[0.08] text-[#A3ACC2]">2</span>
+</div>
+<div class="flex items-center gap-1 text-[#A3ACC2]">
+<button class="w-7 h-7 rounded-lg hover:bg-white/[0.08] hover:text-white flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+</button>
+<button class="w-7 h-7 rounded-lg hover:bg-white/[0.08] hover:text-white flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- Cards Stack with Mid-Drag & Drop Target states -->
+<div class="flex flex-col gap-3 min-h-[420px] relative">
+<!-- Mid-Drag Floating Card: 'Fix date format on invoices' -->
+<article class="relative z-30 rounded-2xl bg-white/[0.14] backdrop-blur-2xl border-2 border-[#5EEAD4]/70 p-4 transform scale-105 rotate-2 shadow-[0_20px_35px_-5px_rgba(0,0,0,0.6),0_0_28px_rgba(94,234,212,0.35)] cursor-grabbing transition-transform select-none">
+<div class="flex items-start justify-between gap-3 mb-2">
+<span class="px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-amber-500/20 text-amber-300 border border-amber-400/30 flex items-center gap-1 font-semibold">
+<span class="material-symbols-outlined text-[12px] text-[#5EEAD4]" data-icon="open_with">open_with</span>
+                  Billing
+                </span>
+<span class="text-white text-xs font-mono font-bold bg-[#0B1020]/60 px-1.5 py-0.5 rounded">#TP-099</span>
+</div>
+<h3 class="font-headline-md text-[15px] font-bold text-white leading-snug mb-1.5">
+                Fix date format on invoices
+              </h3>
+<p class="font-body-sm text-body-sm text-[#E6E9F2] line-clamp-2 mb-3">
+                Standardize ISO-8601 strings across international currency PDF generation engines.
+              </p>
+<div class="pt-2.5 border-t border-white/[0.12] flex items-center justify-between">
+<!-- Assignee: Riley Chen in coral -->
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-[#FB7185]/30 border border-[#FB7185] flex items-center justify-center text-[#FDA4AF] font-label-sm text-[10px] font-bold shadow-[0_0_8px_rgba(251,113,133,0.35)]">
+                    RC
+                  </div>
+<span class="font-body-sm text-body-sm text-white font-medium">Riley Chen</span>
+</div>
+<div class="flex items-center gap-2 text-white text-xs">
+<span class="flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/[0.1]" title="Comments">
+<span class="material-symbols-outlined text-[13px]" data-icon="chat_bubble_outline">chat_bubble_outline</span>
+                    4
+                  </span>
+<span class="material-symbols-outlined text-[15px] text-amber-400" data-icon="flag" title="Medium priority">flag</span>
+</div>
+</div>
+</article>
+<!-- Active Drop Slot Indicator -->
+<div class="border-2 border-dashed border-[#5EEAD4] bg-[#5EEAD4]/10 rounded-2xl p-4 text-center text-xs text-[#5EEAD4] font-medium tracking-wide flex items-center justify-center gap-2 shadow-[0_0_18px_rgba(94,234,212,0.15)] animate-pulse">
+<span class="material-symbols-outlined text-[18px]" data-icon="add_circle">add_circle</span>
+<span>Drop task to transition to In Review</span>
+</div>
+<!-- Card 3.2: Update onboarding checklist copy -->
+<article class="group relative rounded-2xl bg-white/[0.04] opacity-80 hover:opacity-100 hover:bg-white/[0.08] backdrop-blur-xl border border-white/[0.08] hover:border-white/[0.18] p-4 shadow-[0_8px_24px_-4px_rgba(0,0,0,0.35)] transition-all duration-200 hover:-translate-y-0.5 cursor-grab">
+<div class="flex items-start justify-between gap-3 mb-2.5">
+<span class="px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-indigo-500/10 text-indigo-300 border border-indigo-400/20">
+                  UX Copy
+                </span>
+<span class="text-[#A3ACC2] text-xs font-mono font-medium">#TP-087</span>
+</div>
+<h3 class="font-headline-md text-[15px] font-semibold text-[#E6E9F2] leading-snug mb-1.5 group-hover:text-white">
+                Update onboarding checklist copy
+              </h3>
+<p class="font-body-sm text-body-sm text-[#A3ACC2] line-clamp-2 mb-4">
+                Clarify domain verification steps for enterprise Google Workspace and Okta SAML setups.
+              </p>
+<div class="pt-3 border-t border-white/[0.07] flex items-center justify-between">
+<!-- Assignee: Alex Morgan (indigo avatar) -->
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-[#6366F1]/25 border border-[#6366F1]/50 flex items-center justify-center text-[#A5B4FC] font-label-sm text-[10px] font-bold">
+                    AM
+                  </div>
+<span class="font-body-sm text-body-sm text-[#E6E9F2]">Alex Morgan</span>
+</div>
+<div class="flex items-center gap-3 text-[#A3ACC2] text-xs">
+<span class="flex items-center gap-1" title="Reviews">
+<span class="material-symbols-outlined text-[15px]" data-icon="rate_review">rate_review</span>
+                    2/2
+                  </span>
+<span class="material-symbols-outlined text-[15px] text-sky-400" data-icon="flag" title="Low priority">flag</span>
+</div>
+</div>
+</article>
+<!-- Card 3.3: Refactor search filters (Assigned to Sam Lee with 'You' chip) -->
+<article class="group relative rounded-2xl bg-white/[0.13] hover:bg-white/[0.17] backdrop-blur-xl border border-white/[0.18] hover:border-white/[0.28] p-4 shadow-[0_12px_28px_-4px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.22)] transition-all duration-200 hover:-translate-y-0.5 cursor-grab">
+<!-- Glowing Teal Left Edge Accent Strip -->
+<div class="absolute left-0 top-3 bottom-3 w-[3.5px] rounded-r-full bg-[#5EEAD4] shadow-[0_0_12px_rgba(94,234,212,0.8)]"></div>
+<div class="flex items-start justify-between gap-3 mb-2.5 pl-2">
+<span class="px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-emerald-500/10 text-emerald-300 border border-emerald-400/20 font-semibold">
+                  Performance
+                </span>
+<span class="text-[#A3ACC2] text-xs font-mono font-medium">#TP-079</span>
+</div>
+<h3 class="font-headline-md text-[15px] font-semibold text-white leading-snug mb-1.5 pl-2">
+                Refactor search filters
+              </h3>
+<p class="font-body-sm text-body-sm text-[#A3ACC2] line-clamp-2 mb-4 pl-2">
+                Debounce search input queries and introduce virtual scrolling for datasets over 5,000 nodes.
+              </p>
+<div class="pt-3 border-t border-white/[0.08] flex items-center justify-between pl-2">
+<!-- Assignee: Sam Lee with 'You' chip -->
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-[#5EEAD4]/25 border border-[#5EEAD4] flex items-center justify-center text-[#5EEAD4] font-label-sm text-[10px] font-bold shadow-[0_0_8px_rgba(94,234,212,0.3)]">
+                    SL
+                  </div>
+<span class="font-body-sm text-body-sm text-[#E6E9F2] font-medium">Sam Lee</span>
+<span class="bg-[#5EEAD4] text-[#0B1020] font-semibold px-2 py-0.5 rounded-full text-xs shadow-[0_0_8px_rgba(94,234,212,0.4)]">You</span>
+</div>
+<div class="flex items-center gap-3 text-[#A3ACC2] text-xs">
+<span class="flex items-center gap-1 text-[#5EEAD4]" title="Code review underway">
+<span class="material-symbols-outlined text-[15px]" data-icon="visibility">visibility</span>
+                    Reviewing
+                  </span>
+<span class="material-symbols-outlined text-[15px] text-rose-400" data-icon="flag" title="High priority">flag</span>
+</div>
+</div>
+</article>
+</div>
+</div>
+<!-- ================= COLUMN 4: DONE ================= -->
+<div class="flex flex-col rounded-[20px] bg-white/[0.04] backdrop-blur-2xl border border-white/[0.09] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] p-4 relative overflow-visible">
+<!-- Top Accent Light Line -->
+<div class="absolute top-0 left-6 right-6 h-[2px] bg-gradient-to-r from-transparent via-[#86EFAC]/70 to-transparent"></div>
+<!-- Column Header -->
+<div class="flex items-center justify-between pb-4 pt-1 px-1">
+<div class="flex items-center gap-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#86EFAC] shadow-[0_0_8px_rgba(134,239,172,0.6)]"></span>
+<h2 class="font-label-lg text-label-lg font-semibold text-[#E6E9F2] tracking-wide">Done</h2>
+<span class="px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-white/[0.06] border border-white/[0.08] text-[#A3ACC2]">2</span>
+</div>
+<div class="flex items-center gap-1 text-[#A3ACC2]">
+<button class="w-7 h-7 rounded-lg hover:bg-white/[0.08] hover:text-white flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+</button>
+<button class="w-7 h-7 rounded-lg hover:bg-white/[0.08] hover:text-white flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- Cards Stack -->
+<div class="flex flex-col gap-3 min-h-[420px]">
+<!-- Card 4.1: Set up error monitoring -->
+<article class="group relative rounded-2xl bg-white/[0.04] opacity-80 hover:opacity-100 hover:bg-white/[0.08] backdrop-blur-xl border border-white/[0.08] hover:border-white/[0.16] p-4 shadow-[0_8px_24px_-4px_rgba(0,0,0,0.35)] transition-all duration-200 hover:-translate-y-0.5 cursor-grab">
+<div class="flex items-start justify-between gap-3 mb-2.5">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-teal-500/10 text-teal-300 border border-teal-400/20">
+                    DevOps
+                  </span>
+<!-- Completed checkmark badge -->
+<span class="flex items-center gap-1 text-[11px] font-label-sm text-[#86EFAC] bg-[#86EFAC]/10 px-2 py-0.5 rounded-full border border-[#86EFAC]/25">
+<span class="material-symbols-outlined text-[13px] font-bold" data-icon="check">check</span>
+                    Done
+                  </span>
+</div>
+<span class="text-[#A3ACC2] text-xs font-mono font-medium">#TP-071</span>
+</div>
+<h3 class="font-headline-md text-[15px] font-semibold text-[#E6E9F2]/90 leading-snug mb-1.5 group-hover:text-white">
+                Set up error monitoring
+              </h3>
+<p class="font-body-sm text-body-sm text-[#A3ACC2] line-clamp-2 mb-4">
+                Configured Sentry alerting relays with PagerDuty escalation policies for production outages.
+              </p>
+<div class="pt-3 border-t border-white/[0.07] flex items-center justify-between">
+<!-- Assignee: Jordan Patel (emerald) -->
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-[#34D399]/25 border border-[#34D399]/50 flex items-center justify-center text-[#6EE7B7] font-label-sm text-[10px] font-bold">
+                    JP
+                  </div>
+<span class="font-body-sm text-body-sm text-[#E6E9F2]">Jordan Patel</span>
+</div>
+<div class="flex items-center gap-3 text-[#A3ACC2] text-xs">
+<span class="flex items-center gap-1 text-[#86EFAC]" title="Complete">
+<span class="material-symbols-outlined text-[15px]" data-icon="done_all">done_all</span>
+                    5/5
+                  </span>
+</div>
+</div>
+</article>
+<!-- Card 4.2: Accessibility audit for dashboard -->
+<article class="group relative rounded-2xl bg-white/[0.04] opacity-80 hover:opacity-100 hover:bg-white/[0.08] backdrop-blur-xl border border-white/[0.08] hover:border-white/[0.16] p-4 shadow-[0_8px_24px_-4px_rgba(0,0,0,0.35)] transition-all duration-200 hover:-translate-y-0.5 cursor-grab">
+<div class="flex items-start justify-between gap-3 mb-2.5">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-purple-500/10 text-purple-300 border border-purple-400/20">
+                    Compliance
+                  </span>
+<!-- Completed checkmark badge -->
+<span class="flex items-center gap-1 text-[11px] font-label-sm text-[#86EFAC] bg-[#86EFAC]/10 px-2 py-0.5 rounded-full border border-[#86EFAC]/25">
+<span class="material-symbols-outlined text-[13px] font-bold" data-icon="check">check</span>
+                    Done
+                  </span>
+</div>
+<span class="text-[#A3ACC2] text-xs font-mono font-medium">#TP-065</span>
+</div>
+<h3 class="font-headline-md text-[15px] font-semibold text-[#E6E9F2]/90 leading-snug mb-1.5 group-hover:text-white">
+                Accessibility audit for dashboard
+              </h3>
+<p class="font-body-sm text-body-sm text-[#A3ACC2] line-clamp-2 mb-4">
+                Achieved WCAG 2.1 AA level compliance on keyboard navigation traps and high contrast ARIA roles.
+              </p>
+<div class="pt-3 border-t border-white/[0.07] flex items-center justify-between">
+<!-- Assignee: Riley Chen -->
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-[#FB7185]/25 border border-[#FB7185]/50 flex items-center justify-center text-[#FDA4AF] font-label-sm text-[10px] font-bold">
+                    RC
+                  </div>
+<span class="font-body-sm text-body-sm text-[#E6E9F2]">Riley Chen</span>
+</div>
+<div class="flex items-center gap-3 text-[#A3ACC2] text-xs">
+<span class="flex items-center gap-1 text-[#86EFAC]" title="Complete">
+<span class="material-symbols-outlined text-[15px]" data-icon="done_all">done_all</span>
+                    12/12
+                  </span>
+</div>
+</div>
+</article>
+</div>
+</div>
+</section>
+</main>
+<!-- ================= SUBTLE WORKSPACE FOOTER STATUS BAR ================= -->
+<footer class="w-full bg-[#0B1020]/70 backdrop-blur-md border-t border-white/[0.06] px-8 py-2.5 text-xs text-[#A3ACC2] flex flex-col sm:flex-row items-center justify-between gap-2 z-20">
+<div class="flex items-center gap-4">
+<span class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          All systems operational
+        </span>
+<span class="text-white/20">|</span>
+<span>Realtime sync active (4 peers connected)</span>
+</div>
+<div class="flex items-center gap-6">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]" data-icon="keyboard">keyboard</span>
+<span>Press <kbd class="px-1 py-0.5 bg-white/10 rounded text-[10px]">C</kbd> for quick task</span>
+</span>
+<a class="hover:text-[#5EEAD4] transition-colors" href="#">Documentation</a>
+<a class="hover:text-[#5EEAD4] transition-colors" href="#">Shortcuts</a>
+</div>
+</footer>
+</div>
+</body></html>
