@@ -435,7 +435,7 @@ None. All 15 manifest rows are `generated`.
 | No authentication (Principle I; Security Req. central auth) | Spec phase 1 decision: predefined users, no login; identity choice only | Adding login contradicts the spec scope. Mitigated by deny-by-default `X-Taskify-User` check, audit log, localhost-only binding |
 | No TLS (Security Req.) | Server bound to 127.0.0.1 for local development only | Local certificates add setup cost with no attacker on the loopback interface; required before any network exposure |
 | No rate limiting (Security Req.) | No public endpoints; localhost only | A limiter protects nothing locally; must be added together with authentication before exposure |
-| CI not yet running (Workflow: "CI MUST pass before merge") | The repository has no remote, so no CI service can run `.github/workflows/ci.yml` | Dropping the gate entirely was rejected; instead `scripts/check.ps1` runs the identical gates and MUST pass locally before every merge. This row is removed as soon as a remote is added and the workflow runs |
+| CI not yet running (Workflow: "CI MUST pass before merge") | The repository has no remote, so no CI service can run `.github/workflows/ci.yml` | Dropping the gate entirely was rejected; instead `scripts/check.ps1` runs the identical gates and MUST pass locally before every merge. The workflow's automatic triggers are disabled (manual `workflow_dispatch` only) until then; this row is removed once a remote is added and the push/pull-request triggers are restored |
 
 ## Out of Scope for This Plan
 
