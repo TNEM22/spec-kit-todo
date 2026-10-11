@@ -8,8 +8,10 @@ One contract per designed screen. Paths are under `frontend/src/app/`. Every rou
 stored in `sessionStorage` or `GET /users/me` returns 401 (FR-005).
 
 The Stitch designs are visual references. Elements they added that the spec excludes (search,
-analytics tabs, tags, ticket ids, due dates, checklists, sprint badge, team "+", column "+"/"…"
-menus, realtime footer) are **not** part of any contract below. The notification bell **is** in
+filters, settings icon/page, "Board / List" view toggle, analytics and timeline tabs, tags, ticket
+ids, due dates, checklists, progress bars on cards, priority flags, comment counts on cards, sprint
+badge, team "+", column "+"/"…" menus, footer with sync status, documentation and shortcut links)
+are **not** part of any contract below (spec Assumptions; clarification closing review CHK040). The notification bell **is** in
 scope (US5).
 
 ## Global layout and behavior
@@ -98,7 +100,8 @@ scope (US5).
 - **Inputs**: `projectId` route param, selected user
 - **Data**: `GET /projects/:projectId/board` → title, description, four columns in fixed order with
   counts; cards show title (two-line clamp), assignee avatar and name or "Unassigned", "You" chip
-  and teal edge when assigned to the selected user (FR-014, FR-016)
+  and teal edge when assigned to the selected user (FR-014, FR-016), and the "Move to" button.
+  Cards show nothing else (no comment counts, tags, ids, dates or flags)
 - **Actions**:
   - Drag a card to any column or position → optimistic update, `POST /tasks/:id/move` with
     `column` and `position`; rollback and toast on error (FR-013)
@@ -162,8 +165,8 @@ scope (US5).
   `comment-composer/`
 - **Inputs**: `projectId`, `taskId` route params, selected user
 - **Data**: `GET /tasks/:taskId`, `GET /tasks/:taskId/comments`; status chip, title, created/updated
-  dates, Status select, Assignee select, description, comments (oldest first, author, time,
-  "edited" marker)
+  dates, Status select, Assignee select, description, a "Comments · N" heading, comments (oldest
+  first, author, time, "edited" marker)
 - **Actions**:
   - Edit title or description inline → `PATCH /tasks/:taskId` (FR-011)
   - Change assignee, including "Unassigned" → `PATCH /tasks/:taskId` with `assignee_id` (FR-012)

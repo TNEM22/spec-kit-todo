@@ -87,6 +87,11 @@
   measured against the actual translucent background; the operating system's reduced-motion
   setting turns off decorative motion; "not found" messages close by themselves after 6 seconds.
   (Recommended defaults from review CHK029–CHK037 and CHK040, accepted by user delegation.)
+- Q: Are a settings page, a list view of the board, comment counts on task cards, and a footer
+  with status and help links part of this phase? → A: No. They appear only in generated mockups;
+  all four are out of scope. A comment count may appear only as the "Comments · N" heading inside
+  the task details. (Closes requirements review CHK040; recommended default, accepted by user
+  delegation.)
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -459,7 +464,9 @@ Required by Constitution Principle I.
   and pop-up alerts are out of scope. Due dates, labels/tags, attachments, search, filters, and file
   uploads are also out of scope for this phase, as are other elements sometimes shown in mockups:
   ticket numbers, sprints, timeline or analytics views, checklists or progress bars on cards,
-  priority flags, and adding or changing columns.
+  priority flags, adding or changing columns, a settings page, a list view of the board, comment
+  counts on task cards (the task details may show "Comments · N"), and a footer with sync status,
+  documentation, or shortcut links.
 - Taskify is built as a single application (monolith) in this phase, organized by domain (users,
   projects, tasks, comments, notifications, audit) so domains can be separated later.
 - Taskify is used on desktop web browsers; mobile layout is out of scope for this phase.

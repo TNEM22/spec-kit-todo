@@ -104,6 +104,10 @@ rejection semantics, live project list, "Reconnecting…" indicator, mid-drag an
 handling, notification wording and "99+", loading placeholders (FR-032), reduced motion, 1024 px
 minimum width (research R14).
 
+**Plan revision 2026-10-11 (3)**: aligned with the spec clarification that closes review CHK040
+(settings page, list view, card comment counts and footer links are out of scope). Contracts and
+the Out of Scope list updated; no change to architecture, data model, gates or task scope.
+
 ## Project Structure
 
 ### Documentation (this feature)
@@ -398,3 +402,6 @@ None. All 15 manifest rows are `generated`.
   notifications (spec Assumptions; in-app notifications are planned, research R7).
 - Project and task deletion, user management, audit log screen, presence indicators, mobile layouts
   (spec Assumptions).
+- Settings page, board list view, comment counts on task cards, and a footer with sync status,
+  documentation or shortcut links, even though Stitch drew them (spec clarification closing review
+  CHK040; the task details may show "Comments · N").

@@ -64,6 +64,9 @@ NotificationOut { id, type: "task_assigned"|"task_commented"|"task_moved", actor
 NotificationList { items: NotificationOut[], unread_count: int }
 ```
 
+`TaskOut.comment_count` exists only for the "Comments · N" heading in the task details; task cards
+must not show it (spec Assumptions, review CHK040).
+
 ## Endpoints
 
 ### Health and metrics
