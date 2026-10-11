@@ -8,6 +8,34 @@
 
 **Input**: User description: "Develop Taskify, a team productivity platform where predefined users create projects, assign tasks, comment, and move tasks across Kanban columns (To Do, In Progress, In Review, Done). Five users (one product manager, four engineers), three sample projects, no login for this first phase."
 
+## Clarifications
+
+### Session 2026-10-11
+
+- Q: Who should be allowed to move a task between columns? → A: Anyone can move any task to any
+  column; no role, assignee, or column-order restrictions.
+- Q: Should the Product Manager be able to delete other users' comments? → A: No. Only a comment's
+  author can edit or delete it, with no exceptions for any role.
+- Q: Who can assign a task, and to whom? → A: Any user can assign any task to any of the five users
+  (including themselves), change the assignee, or clear it. (Recommended default, accepted by user
+  delegation.)
+- Q: What happens to a deleted comment, and is there a time limit on editing or deleting? → A: It is
+  removed from the task for all users with no placeholder; the audit log keeps the record. Authors
+  can edit or delete their comments at any time. (Recommended default, accepted by user delegation.)
+- Q: Where does a task land in its column when created or moved? → A: New tasks go to the bottom of
+  To Do; a dragged task lands where it is dropped; a task moved without dragging goes to the bottom
+  of the target column. (Recommended default, accepted by user delegation.)
+- Q: Should Taskify remember the selected user across page reloads and browser restarts? → A: It is
+  remembered until the browser tab or window is closed; reloads keep it, a new browser session
+  returns to user selection. (Recommended default, accepted by user delegation.)
+- Q: Can users view the audit log inside Taskify? → A: No. In this phase the audit log is recorded
+  for maintainers only; there is no audit screen. (Recommended default, accepted by user delegation.)
+- Q: What accessibility level must Taskify meet? → A: WCAG 2.1 Level AA for all screens in this
+  phase. (Recommended default, accepted by user delegation.)
+- Q: What happens when two users edit the same task's details at nearly the same time? → A: The last
+  save wins, the same rule as for moves; no merge or conflict warning in this phase. (Recommended
+  default, accepted by user delegation.)
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Pick a user and work a project board (Priority: P1)
@@ -84,7 +112,8 @@ switch to another user and confirm the comment is visible but cannot be edited o
 1. **Given** a task is open, **When** the user adds a non-empty comment, **Then** it appears at the
    end of the comment list with the current user as author and the time it was posted.
 2. **Given** a comment written by the current user, **When** they edit or delete it, **Then** the
-   change is saved; edited comments are marked as edited.
+   change is saved; edited comments are marked as edited, and deleted comments disappear from the
+   task for all users.
 3. **Given** a comment written by another user, **When** the current user views it, **Then** no edit
    or delete option is available, and any attempt to change it is rejected.
 4. **Given** the comment form, **When** the user submits an empty or over-length comment, **Then**
@@ -118,15 +147,18 @@ for every user and opens to an empty four-column board.
 - A task is dropped back onto the column it came from: nothing changes and no error is shown.
 - Two users move the same task at nearly the same time: the last move wins and every viewer sees
   the final column after refresh.
-- A user selects a task that another user has just deleted or that no longer exists: a clear
-  "not found" message is shown and the board refreshes.
+- Two users edit the same task's title, description, or assignee at nearly the same time: the last
+  save wins, with no merge or conflict warning.
+- A user acts on a comment its author has just deleted, or opens a task or project that does not
+  exist (e.g., from a stale or edited link): a clear "not found" message is shown and the view
+  refreshes.
 - Input contains HTML, script, or other markup: it is stored and displayed as plain text, never
   interpreted.
 - Input contains only whitespace: it is treated as empty and rejected.
 - A request names a user, project, task, column, or comment that does not exist: it is rejected
   with a clear error and no data is changed.
 - A project has no tasks: the board shows four empty columns with a prompt to create a task.
-- Large boards (e.g., 200 tasks in one project) remain usable.
+- A project has 200 tasks: the board meets the responsiveness target in SC-007.
 
 ## Requirements *(mandatory)*
 
@@ -137,7 +169,8 @@ for every user and opens to an empty four-column board.
 - **FR-001**: System MUST provide exactly five predefined users: one Product Manager and four
   Engineers, each with a display name and role.
 - **FR-002**: System MUST let a visitor select one of the predefined users without a password, and
-  MUST show the selected user's name throughout the session.
+  MUST show the selected user's name throughout the session. The selection MUST be kept across page
+  reloads and cleared when the browser tab or window is closed.
 - **FR-003**: System MUST let the current user switch to a different predefined user at any time.
 - **FR-004**: System MUST NOT allow creating, editing, or deleting users in this phase.
 - **FR-005**: System MUST require a selected user before any project, task, or comment can be
@@ -156,12 +189,15 @@ for every user and opens to an empty four-column board.
 - **FR-009**: Each project board MUST have exactly four columns, in this fixed order: To Do,
   In Progress, In Review, Done. Columns cannot be added, renamed, removed, or reordered.
 - **FR-010**: Users MUST be able to create a task in a project with a title (1–200 characters) and
-  an optional description (up to 5,000 characters). New tasks start in To Do.
+  an optional description (up to 5,000 characters). New tasks are added at the bottom of To Do.
 - **FR-011**: Users MUST be able to edit a task's title and description, subject to the same limits.
-- **FR-012**: Users MUST be able to assign a task to any one of the five users, or leave it
-  unassigned. A task has at most one assignee.
-- **FR-013**: Users MUST be able to move any task to any column by drag and drop, and MUST also have
-  a non-drag way to change a task's column (e.g., for keyboard users).
+- **FR-012**: Any user MUST be able to assign any task to any one of the five users (including
+  themselves), change its assignee, or clear it to Unassigned. A task has at most one assignee.
+- **FR-013**: Any user, regardless of role or assignee, MUST be able to move any task from any column
+  to any other column, forward or backward and skipping columns, by drag and drop. Users MUST also
+  have a non-drag way to change a task's column (e.g., for keyboard users). A dragged task is placed
+  where it is dropped, including reordering within the same column; a task moved without dragging
+  is placed at the bottom of the target column.
 - **FR-014**: System MUST visually distinguish tasks assigned to the current user from all others.
 - **FR-015**: System MUST persist all changes to projects, tasks, assignments, columns, and comments
   so that they survive reloads and are visible to every user.
@@ -173,9 +209,10 @@ for every user and opens to an empty four-column board.
   records its author (the current user) and creation time.
 - **FR-018**: System MUST show a task's comments in chronological order, oldest first, with author
   name and time.
-- **FR-019**: Users MUST be able to edit and delete only their own comments. System MUST reject
-  edits or deletions of another user's comment, including attempts that bypass the interface.
-  Edited comments MUST be marked as edited.
+- **FR-019**: Only a comment's author MUST be able to edit or delete it, at any time; no role,
+  including the Product Manager, is exempt. System MUST reject edits or deletions of another user's
+  comment, including attempts that bypass the interface. Edited comments MUST be marked as edited.
+  Deleted comments MUST be removed from the task for all users, with no placeholder.
 
 **Validation and security**
 
@@ -187,9 +224,16 @@ for every user and opens to an empty four-column board.
 - **FR-022**: System MUST reject any request that references a non-existent or unknown user,
   project, task, column, or comment.
 - **FR-023**: System MUST record an audit entry for each create, update, move, assignment, and
-  delete, including which user performed it and when.
+  delete, including which user performed it and when. The audit log is available to maintainers
+  only; it is not viewable in the app in this phase.
 - **FR-024**: Error messages MUST NOT reveal internal details such as stack traces or system
   identifiers beyond what the user already sees.
+
+**Accessibility**
+
+- **FR-025**: All screens MUST meet WCAG 2.1 Level AA. Every action, including moving tasks, MUST be
+  possible with a keyboard alone, and the highlight for the current user's tasks MUST NOT rely on
+  color alone.
 
 ### Key Entities
 
@@ -235,7 +279,8 @@ Required by Constitution Principle I.
 - **SC-005**: 100% of invalid inputs (empty, over-length, unknown references, markup) are rejected
   or rendered harmless, as verified by a test set covering every input field.
 - **SC-006**: 0 cases in which a user can edit or delete another user's comment.
-- **SC-007**: A board with 200 tasks loads and remains responsive to drag and drop for a single user.
+- **SC-007**: A board with 200 tasks loads within 3 seconds, and a dropped task shows in its new
+  position within 1 second.
 - **SC-008**: In a walkthrough, all five sample users can each identify their own assigned tasks on
   a board at a glance.
 
@@ -248,8 +293,6 @@ Required by Constitution Principle I.
 - Users and their names are fixed sample data, e.g., one Product Manager and four Engineers with
   distinct names; exact names are chosen during planning.
 - Sample tasks cover all four columns and include assigned and unassigned tasks.
-- Task order within a column is kept when tasks are moved; precise reordering within a column is
-  supported where drag and drop allows it.
 - Real-time live updates are not required; other users see changes on refresh.
 - Notifications, due dates, labels, attachments, search, and file uploads are out of scope.
 - Taskify is used on desktop web browsers; mobile layout is out of scope for this phase.
