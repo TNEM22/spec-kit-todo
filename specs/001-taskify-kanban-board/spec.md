@@ -35,6 +35,27 @@
 - Q: What happens when two users edit the same task's details at nearly the same time? → A: The last
   save wins, the same rule as for moves; no merge or conflict warning in this phase. (Recommended
   default, accepted by user delegation.)
+- Q: Are notifications part of this phase? → A: Yes, in-app notifications only (revised; an
+  earlier answer in this session excluded them). Email and other outside channels stay out of scope.
+  Live board updates and notifications are separate: both are delivered live.
+- Q: Which events create a notification for a user? → A: A task is assigned to them; someone
+  comments on a task assigned to them; someone else moves a task assigned to them to another column.
+  Nobody is notified about their own actions. (Recommended default, accepted by user delegation.)
+- Q: Where do users see notifications? → A: A bell in the top navigation bar with an unread count;
+  it opens a panel listing notifications newest first. Opening a notification goes to its task and
+  marks it read; "Mark all as read" clears the count. No pop-up toasts for notifications.
+  (Recommended default, accepted by user delegation.)
+- Q: How long are notifications kept, and can they be deleted? → A: The 100 most recent per user are
+  kept; older ones are removed automatically. Users can mark them read but not delete them.
+  (Recommended default, accepted by user delegation.)
+- Q: Who can see a notification, and how fast must it arrive? → A: Only its recipient; it appears
+  within 2 seconds while the recipient has Taskify open, and otherwise on their next visit.
+  (Recommended default, accepted by user delegation.)
+- Q: Should Taskify be built as separate services or as one application in this phase? → A: One
+  application (a monolith) in this phase, structured by domain so parts can be separated later.
+- Q: Do other users see changes live, or only after refreshing? → A: Live. Changes appear for every
+  user viewing the affected board or task without a refresh. (Derived from the user's planning
+  input; aligns the spec with the planned real-time updates.)
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -142,11 +163,41 @@ for every user and opens to an empty four-column board.
 
 ---
 
+### User Story 5 - Notifications (Priority: P5)
+
+A user sees a bell with an unread count in the top navigation bar. Opening it shows notifications
+about their own work: a task assigned to them, a comment on a task assigned to them, or someone else
+moving a task assigned to them. Selecting a notification opens that task and marks it read.
+
+**Why this priority**: Notifications help people notice changes to their work, but the board,
+tasks and comments are fully usable without them.
+
+**Independent Test**: As Alex Morgan, assign a task to Sam Lee; with Sam Lee's view open in another
+window, confirm Sam's bell count increases within 2 seconds, open the notification, land on the task,
+and confirm the count drops.
+
+**Acceptance Scenarios**:
+
+1. **Given** Sam Lee has Taskify open, **When** another user assigns a task to Sam, comments on a
+   task assigned to Sam, or moves a task assigned to Sam to another column, **Then** Sam's unread
+   count increases within 2 seconds without a refresh.
+2. **Given** a user acts on their own task (e.g., assigns it to themselves or comments on it),
+   **When** the action completes, **Then** no notification is created for them.
+3. **Given** a user has unread notifications, **When** they open the bell, **Then** they see the
+   newest first, each with who did what, on which task, and when; unread ones are marked.
+4. **Given** the notification panel is open, **When** the user selects a notification, **Then** its
+   task opens and the notification becomes read; **When** they choose "Mark all as read", **Then**
+   the unread count becomes 0.
+5. **Given** Sam Lee was offline when notified, **When** Sam next selects their user, **Then** the
+   unread notifications are shown.
+
+---
+
 ### Edge Cases
 
 - A task is dropped back onto the column it came from: nothing changes and no error is shown.
 - Two users move the same task at nearly the same time: the last move wins and every viewer sees
-  the final column after refresh.
+  the final column without refreshing.
 - Two users edit the same task's title, description, or assignee at nearly the same time: the last
   save wins, with no merge or conflict warning.
 - A user acts on a comment its author has just deleted, or opens a task or project that does not
@@ -159,6 +210,12 @@ for every user and opens to an empty four-column board.
   with a clear error and no data is changed.
 - A project has no tasks: the board shows four empty columns with a prompt to create a task.
 - A project has 200 tasks: the board meets the responsiveness target in SC-007.
+- A notification refers to a comment that was later deleted: the notification stays and opens the
+  task; the deleted comment is not shown.
+- A task is assigned to someone and quickly reassigned: each assignment notifies its new assignee;
+  earlier notifications are not withdrawn.
+- A user has more than 100 notifications: the oldest are removed so 100 remain.
+- A user has no notifications: the panel shows "You're all caught up".
 
 ## Requirements *(mandatory)*
 
@@ -200,7 +257,9 @@ for every user and opens to an empty four-column board.
   is placed at the bottom of the target column.
 - **FR-014**: System MUST visually distinguish tasks assigned to the current user from all others.
 - **FR-015**: System MUST persist all changes to projects, tasks, assignments, columns, and comments
-  so that they survive reloads and are visible to every user.
+  so that they survive reloads and are visible to every user. Changes MUST appear for other users
+  viewing the affected board or task without a refresh; after a lost connection is restored, the
+  open view MUST reload so no change is missed.
 - **FR-016**: Each task card MUST show at least its title and assignee (or "Unassigned").
 
 **Comments**
@@ -235,6 +294,26 @@ for every user and opens to an empty four-column board.
   possible with a keyboard alone, and the highlight for the current user's tasks MUST NOT rely on
   color alone.
 
+**Notifications**
+
+- **FR-026**: System MUST create a notification for a user when another user (a) assigns a task to
+  them, (b) comments on a task assigned to them, or (c) moves a task assigned to them to a different
+  column. System MUST NOT create a notification for a user's own actions or for reordering within
+  the same column.
+- **FR-027**: Each notification MUST record its recipient, the user who caused it, the event type,
+  the task (and project) it concerns, its creation time, and whether it has been read.
+- **FR-028**: System MUST show a bell in the top navigation bar with the current user's unread
+  count, and a panel listing their notifications newest first. Selecting a notification MUST open
+  its task and mark it read; users MUST be able to mark all as read. Users cannot delete
+  notifications.
+- **FR-029**: A notification MUST reach its recipient within 2 seconds while they have Taskify open,
+  without a refresh, and MUST be listed on their next visit otherwise. Notifications are separate
+  from the live board updates in FR-015.
+- **FR-030**: System MUST keep the 100 most recent notifications per user and remove older ones
+  automatically.
+- **FR-031**: System MUST show and deliver each notification only to its recipient, and MUST reject
+  any attempt to read or mark another user's notifications.
+
 ### Key Entities
 
 - **User**: One of five predefined team members. Has a display name and a role (Product Manager or
@@ -245,6 +324,9 @@ for every user and opens to an empty four-column board.
   (status), optional assignee (a User), position within its column, and created/updated times.
 - **Comment**: A message on a task. Has text, author (a User), creation time, and an edited marker.
 - **Audit Entry**: A record of a change: who made it, what was changed, and when.
+- **Notification**: A message to one user about a change to their work. Has recipient (a User),
+  actor (a User), event type (assigned, commented, moved), the task and project concerned, creation
+  time, and read state.
 
 ## Security Considerations
 
@@ -256,8 +338,8 @@ Required by Constitution Principle I.
   data. Taskify MUST NOT be exposed to untrusted networks or hold real confidential data until
   authentication is added. The plan MUST record this deviation in its Constitution Check.
 - **Authorization**: Even without login, the server MUST enforce the rules it can: a user may edit
-  or delete only their own comments (FR-019), and every request MUST name a valid selected user
-  (FR-005).
+  or delete only their own comments (FR-019), users see and change only their own notifications
+  (FR-031), and every request MUST name a valid selected user (FR-005).
 - **Input handling**: All input is validated server-side (FR-020) and displayed as plain text
   (FR-021) to prevent injection and cross-site scripting.
 - **Abuse cases**: Impersonating another user is possible by design in this phase; the audit log
@@ -273,7 +355,7 @@ Required by Constitution Principle I.
   column within 1 minute without instructions.
 - **SC-002**: A user can create and assign a new task in under 30 seconds.
 - **SC-003**: A moved task appears in its new column for the user who moved it within 1 second, and
-  is visible to other users on their next refresh.
+  appears for other users viewing the same board within 2 seconds, without a refresh.
 - **SC-004**: 100% of changes (task moves, edits, assignments, comments, new projects) are still
   present after reloading Taskify.
 - **SC-005**: 100% of invalid inputs (empty, over-length, unknown references, markup) are rejected
@@ -283,6 +365,10 @@ Required by Constitution Principle I.
   position within 1 second.
 - **SC-008**: In a walkthrough, all five sample users can each identify their own assigned tasks on
   a board at a glance.
+- **SC-009**: A notification appears in its recipient's unread count within 2 seconds while they
+  have Taskify open.
+- **SC-010**: 0 notifications are created for a user's own actions, and 0 notifications are shown to
+  anyone other than their recipient.
 
 ## Assumptions
 
@@ -293,8 +379,13 @@ Required by Constitution Principle I.
 - Users and their names are fixed sample data, e.g., one Product Manager and four Engineers with
   distinct names; exact names are chosen during planning.
 - Sample tasks cover all four columns and include assigned and unassigned tasks.
-- Real-time live updates are not required; other users see changes on refresh.
-- Notifications, due dates, labels, attachments, search, and file uploads are out of scope.
+- Changes are shown live to other users viewing the same board or task; presence indicators (who
+  else is viewing) are out of scope.
+- Notifications are in-app only; email, push, and other outside channels, notification settings,
+  and pop-up alerts are out of scope. Due dates, labels, attachments, search, and file uploads are
+  also out of scope for this phase.
+- Taskify is built as a single application (monolith) in this phase, organized by domain (users,
+  projects, tasks, comments, notifications, audit) so domains can be separated later.
 - Taskify is used on desktop web browsers; mobile layout is out of scope for this phase.
 - Authentication will be added in a later phase; this spec deliberately excludes it.
 - Sample data is loaded once at first start and is not reset automatically.
